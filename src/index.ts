@@ -216,7 +216,6 @@ export class RealmQueryBuilder<T> {
     const query = this._getQuery();
     const values = this._getQueryValues();
 
-    console.log(`'${query}'`, values.join(', '));
     return this.realmResult.filtered(query, ...values);
   }
 

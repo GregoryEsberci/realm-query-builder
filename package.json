@@ -1,14 +1,42 @@
 {
   "name": "realm-query-builder",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.1.0",
+  "keywords": [
+    "realm",
+    "realmjs",
+    "querybuilder",
+    "query",
+    "builder",
+    "react",
+    "immutable"
+  ],
+  "homepage": "https://github.com/GregoryEsberci/realm-query-builder",
+  "bugs": {
+    "url": "https://github.com/GregoryEsberci/realm-query-builder/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GregoryEsberci/realm-query-builder.git"
+  },
   "license": "MIT",
+  "author": {
+    "name": "Grégory Esberci"
+  },
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts"
+  ],
   "scripts": {
+    "build": "yarn clean && yarn compile",
+    "checktypes": "tsc --noEmit",
     "clean": "rm -rf ./dist",
+    "compile": "yarn compile/js && yarn compile/types",
     "compile/js": "tsc",
     "compile/types": "tsc --declaration --emitDeclarationOnly",
-    "compile": "yarn compile/js && yarn compile/types",
-    "build": "yarn clean && yarn compile",
+    "lint": "eslint . --ignore-path .gitignore",
+    "prepublish": "yarn build",
     "pretest": "yarn clean && yarn compile/js",
     "test": "jest test ./dist"
   },
@@ -31,8 +59,5 @@
   },
   "peerDependencies": {
     "realm": ">=10.0.0"
-  },
-  "engines": {
-    "node": "^14"
   }
 }
