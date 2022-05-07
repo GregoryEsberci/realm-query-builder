@@ -221,7 +221,7 @@ Merge two `RealmQueryBuilder`
 
 The operators [sorted](#sortedfield-string-order-realmquerysort-realmquerybuildert) and [limit](#limitlimit-number-realmquerybuildert) are not merged
 
-Exemplo
+Exemple
 ```ts
 const queryA =  realmQueryBuilder(realm.objects('User'))
   .equalTo('active', true)

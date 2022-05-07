@@ -48,10 +48,6 @@ export class RealmQueryBuilder<T = any> {
     this.realmResult = realmResults;
   }
 
-  static create<R>(realmResults: Realm.Results<R>) {
-    return new RealmQueryBuilder(realmResults);
-  }
-
   clone() {
     return Object.create(this) as this;
   }
@@ -398,6 +394,8 @@ export class RealmQueryBuilder<T = any> {
   }
 }
 
-const realmQueryBuilder = RealmQueryBuilder.create;
+const realmQueryBuilder = <T>(realmResults: Realm.Results<T>) => (
+  new RealmQueryBuilder<T>(realmResults)
+);
 
 export default realmQueryBuilder;

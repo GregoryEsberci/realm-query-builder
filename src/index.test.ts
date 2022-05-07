@@ -15,7 +15,6 @@ beforeEach(() => {
   fakeRealmResults.filtered = jest.fn().mockReturnValue(fakeRealmResults);
   fakeRealmResults.sorted = jest.fn().mockReturnValue(fakeRealmResults);
 
-  // @ts-ignore
   instance = realmQueryBuilder(fakeRealmResults);
 });
 
@@ -66,7 +65,6 @@ describe('alias of where method', () => {
   ])(
     '%s',
     (methodName, operator) => {
-      // @ts-ignore
       let method: (...args: any[]) => any;
 
       beforeEach(() => {
@@ -452,8 +450,7 @@ it('avg', () => {
 
 describe('merge', () => {
   it('filters', () => {
-    // @ts-ignore
-    const toMerge = RealmQueryBuilder.create<DataType>(fakeRealmResults).equalTo('field1', 'value1');
+    const toMerge = realmQueryBuilder<DataType>(fakeRealmResults).equalTo('field1', 'value1');
 
     const newInstance = instance.equalTo('field0', 'value0').merge(toMerge);
 
@@ -466,8 +463,7 @@ describe('merge', () => {
   });
 
   it('distinctFields', () => {
-    // @ts-ignore
-    const toMerge = RealmQueryBuilder.create<DataType>(fakeRealmResults).distinct('field2', 'field3');
+    const toMerge = realmQueryBuilder<DataType>(fakeRealmResults).distinct('field2', 'field3');
 
     const newInstance = instance.distinct('field0', 'field1').merge(toMerge);
 
@@ -480,9 +476,7 @@ describe('merge', () => {
   });
 
   it('groups', () => {
-    const toMerge = RealmQueryBuilder
-      // @ts-ignore
-      .create<DataType>(fakeRealmResults)
+    const toMerge = realmQueryBuilder(fakeRealmResults)
       .equalTo('field2', 'value2')
       .or()
       .beginGroup()
