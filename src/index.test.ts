@@ -277,8 +277,8 @@ describe('group', () => {
       expect(() => instance.endGroup()).toThrow('Group not started');
     });
 
-    it('without criteria', () => {
-      expect(() => instance.beginGroup().endGroup()).toThrow('Invalid group, no criteria found');
+    it('without filters', () => {
+      expect(() => instance.beginGroup().endGroup()).toThrow('Invalid group, no filter found');
     });
   });
 });

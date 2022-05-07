@@ -1,5 +1,4 @@
 import Realm from 'realm';
-import { cloneDeep } from 'lodash';
 
 export type RealmQuerySort = 'asc' | 'desc';
 export type RealmStringOperator = `${'CONTAINS' | 'BEGINSWITH' | 'ENDSWITH' | 'LIKE' | '==' | '!='}${'[c]' | ''}`;
@@ -25,16 +24,16 @@ type Group = {
 }
 
 const DEFAULT_OPERATOR: RealmLogicOperator = 'AND';
-const INITIAL_PREDICATE_END = -1;
+const INITIAL_GROUP_END = -1;
 
-export class RealmQueryBuilder<T> {
+export class RealmQueryBuilder<T = any> {
   private realmResult: Realm.Results<T>;
 
-  private distinctFields: string[] = [];
+  private distinctFields: ReadonlyArray<string> = [];
 
-  private groups: Group[] = [];
+  private groups: ReadonlyArray<Readonly<Group>> = [];
 
-  private filters: Filter[] = [];
+  private filters: ReadonlyArray<Filter> = [];
 
   private operator: RealmLogicOperator | undefined = undefined;
 
@@ -49,15 +48,7 @@ export class RealmQueryBuilder<T> {
   }
 
   clone() {
-    const thisClone = RealmQueryBuilder.create(this.realmResult);
-
-    thisClone.distinctFields = cloneDeep(this.distinctFields);
-    thisClone.groups = cloneDeep(this.groups);
-    thisClone.filters = cloneDeep(this.filters);
-    thisClone.operator = this.operator;
-    thisClone.resultLimit = this.resultLimit;
-
-    return thisClone;
+    return Object.create(this) as this;
   }
 
   where(
@@ -245,7 +236,7 @@ export class RealmQueryBuilder<T> {
       },
     );
 
-    this.groups.push(...newGroups);
+    this.groups = [...this.groups, ...newGroups];
 
     return this;
   }
@@ -253,14 +244,14 @@ export class RealmQueryBuilder<T> {
   private _mergeFilters(query: RealmQueryBuilder<T>) {
     if (query.filters.length) {
       query.filters[0].logicalOperator = this.operator || DEFAULT_OPERATOR;
-      this.filters.push(...query.filters);
+      this.filters = [...this.filters, ...query.filters];
     }
 
     return this;
   }
 
   private _mergeDistinctFields(query: RealmQueryBuilder<T>) {
-    this.distinctFields.push(...query.distinctFields);
+    this.distinctFields = [...this.distinctFields, ...query.distinctFields];
 
     return this;
   }
@@ -299,7 +290,7 @@ export class RealmQueryBuilder<T> {
     }, '');
   }
 
-  private getQuerySuffix() {
+  private _getQuerySuffix() {
     let suffix = '';
 
     if (this.distinctFields.length) {
@@ -316,7 +307,7 @@ export class RealmQueryBuilder<T> {
   private _getQuery() {
     let query = this._getQueryFilter();
 
-    query += this.getQuerySuffix();
+    query += this._getQuerySuffix();
 
     return query;
   }
@@ -326,30 +317,39 @@ export class RealmQueryBuilder<T> {
   }
 
   private _beginGroup() {
-    this.groups.push({
-      start: this.filters.length,
-      end: INITIAL_PREDICATE_END,
-    });
+    this.groups = [
+      ...this.groups,
+      {
+        start: this.filters.length,
+        end: INITIAL_GROUP_END,
+      },
+    ];
 
     return this;
   }
 
   private _endGroup() {
-    const currentGroup = [...this.groups]
-      .reverse()
-      .find((group) => group.end === INITIAL_PREDICATE_END);
+    const currentGroupIndex = this.groups
+      .map((group) => group.end)
+      .lastIndexOf(INITIAL_GROUP_END);
 
-    if (!currentGroup) {
+    if (currentGroupIndex === -1) {
       throw new Error('Group not started');
     }
 
     if (this.filters.length === 0) {
-      throw new Error('Invalid group, no criteria found');
+      throw new Error('Invalid group, no filter found');
     }
 
+    const groupsClone = [...this.groups];
     const end = this.filters.length - 1;
 
-    currentGroup.end = end;
+    groupsClone[currentGroupIndex] = {
+      ...groupsClone[currentGroupIndex],
+      end,
+    };
+
+    this.groups = groupsClone;
 
     return this;
   }
@@ -367,7 +367,7 @@ export class RealmQueryBuilder<T> {
   }
 
   private _distinct(...fields: string[]) {
-    this.distinctFields.push(...fields);
+    this.distinctFields = [...fields];
 
     return this;
   }
@@ -377,12 +377,15 @@ export class RealmQueryBuilder<T> {
     condition: RealmConditionalOperator,
     value: any,
   ) {
-    this.filters.push({
-      field,
-      condition,
-      value,
-      logicalOperator: this.operator || DEFAULT_OPERATOR,
-    });
+    this.filters = [
+      ...this.filters,
+      {
+        field,
+        condition,
+        value,
+        logicalOperator: this.operator || DEFAULT_OPERATOR,
+      },
+    ];
 
     this._resetOperator();
 
