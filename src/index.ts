@@ -1,8 +1,13 @@
 import Realm from 'realm';
 
 export type RealmQuerySort = 'asc' | 'desc';
-export type RealmStringOperator = `${'CONTAINS' | 'BEGINSWITH' | 'ENDSWITH' | 'LIKE' | '==' | '!='}${'[c]' | ''}`;
-export type RealmNumberOperator = `${'>' | '<'}${'=' | ''}`;
+export type RealmStringOperator = 'CONTAINS' | 'CONTAINS[c]'
+  | 'BEGINSWITH' | 'BEGINSWITH[c]'
+  | 'ENDSWITH' | 'ENDSWITH[c]'
+  | 'LIKE' | 'LIKE[c]'
+  | '==' | '==[c]'
+  | '!=' | '!=[c]';
+export type RealmNumberOperator = '>' | '<' | '>=' | '<=';
 export type RealmEqualityOperator = '==' | '!=';
 export type RealmConditionalOperator = RealmNumberOperator
   | RealmStringOperator
