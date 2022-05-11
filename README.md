@@ -66,103 +66,103 @@ realm.objects('User').filtered('active == $0 AND age == $1 DISTINCT(country)', t
 
 ## API
 
-* [`clone(): RealmQueryBuilder`](#clone-realmquerybuilder)
+* [`clone(): this`](#clone-this)
 
-* [`where(field: string, condition: RealmConditionalOperator, value: any): RealmQueryBuilder`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuilder)
+* [`where(field: string, condition: RealmConditionalOperator, value: any): this`](#wherefield-string-condition-realmconditionaloperator-value-any-this)
 
-* [`equalTo(field: string, value: any, caseInsensitive?: boolean): RealmQueryBuilder`](#equaltofield-string-value-any-caseinsensitive-boolean-realmquerybuilder)
+* [`equalTo(field: string, value: any, caseInsensitive?: boolean): this`](#equaltofield-string-value-any-caseinsensitive-boolean-this)
 
-* [`notEqualTo(field: string, value: any, caseInsensitive?: boolean): RealmQueryBuilder`](#notequaltofield-string-value-any-caseinsensitive-boolean-realmquerybuilder)
+* [`notEqualTo(field: string, value: any, caseInsensitive?: boolean): this`](#notequaltofield-string-value-any-caseinsensitive-boolean-this)
 
-* [`like(field: string, value: string, caseInsensitive?: boolean): RealmQueryBuilder`](#likefield-string-value-string-caseinsensitive-boolean-realmquerybuilder)
+* [`like(field: string, value: string, caseInsensitive?: boolean): this`](#likefield-string-value-string-caseinsensitive-boolean-this)
 
-* [`contains(field: string, value: string, caseInsensitive?: boolean): RealmQueryBuilder`](#containsfield-string-value-string-caseinsensitive-boolean-realmquerybuilder)
+* [`contains(field: string, value: string, caseInsensitive?: boolean): this`](#containsfield-string-value-string-caseinsensitive-boolean-this)
 
-* [`beginsWith(field: string, value: string, caseInsensitive?: boolean): RealmQueryBuilder`](#beginswithfield-string-value-string-caseinsensitive-boolean-realmquerybuilder)
+* [`beginsWith(field: string, value: string, caseInsensitive?: boolean): this`](#beginswithfield-string-value-string-caseinsensitive-boolean-this)
 
-* [`endsWith(field: string, value: string, caseInsensitive?: boolean): RealmQueryBuilder`](#endswithfield-string-value-string-caseinsensitive-boolean-realmquerybuilder)
+* [`endsWith(field: string, value: string, caseInsensitive?: boolean): this`](#endswithfield-string-value-string-caseinsensitive-boolean-this)
 
-* [`greaterThan(field: string, value: RealmNumericValueType): RealmQueryBuilder`](#greaterthanfield-string-value-realmnumericvaluetype-realmquerybuilder)
+* [`greaterThan(field: string, value: RealmNumericValueType): this`](#greaterthanfield-string-value-realmnumericvaluetype-this)
 
-* [`greaterThanOrEqualTo(field: string, value: RealmNumericValueType): RealmQueryBuilder`](#greaterthanorequaltofield-string-value-realmnumericvaluetype-realmquerybuilder)
+* [`greaterThanOrEqualTo(field: string, value: RealmNumericValueType): this`](#greaterthanorequaltofield-string-value-realmnumericvaluetype-this)
 
-* [`lessThan(field: string, value: RealmNumericValueType): RealmQueryBuilder`](#lessthanfield-string-value-realmnumericvaluetype-realmquerybuilder)
+* [`lessThan(field: string, value: RealmNumericValueType): this`](#lessthanfield-string-value-realmnumericvaluetype-this)
 
-* [`lessThanOrEqualTo(field: string, value: RealmNumericValueType): RealmQueryBuilder`](#lessthanorequaltofield-string-value-realmnumericvaluetype-realmquerybuilder)
+* [`lessThanOrEqualTo(field: string, value: RealmNumericValueType): this`](#lessthanorequaltofield-string-value-realmnumericvaluetype-this)
 
-* [`between(field: string, start: RealmNumericValueType, end: RealmNumericValueType): RealmQueryBuilder`](#betweenfield-string-start-realmnumericvaluetype-end-realmnumericvaluetype-realmquerybuilder)
+* [`between(field: string, start: RealmNumericValueType, end: RealmNumericValueType): this`](#betweenfield-string-start-realmnumericvaluetype-end-realmnumericvaluetype-this)
 
-* [`or(): RealmQueryBuilder`](#or-realmquerybuilder)
+* [`or(): this`](#or-this)
 
-* [`and(): RealmQueryBuilder`](#and-realmquerybuilder)
+* [`and(): this`](#and-this)
 
-* [`beginGroup(): RealmQueryBuilder`](#begingroup-realmquerybuilder)
+* [`beginGroup(): this`](#begingroup-this)
 
-* [`endGroup(): RealmQueryBuilder`](#endgroup-realmquerybuilder)
+* [`endGroup(): this`](#endgroup-this)
 
-* [`in(field: string, values: ReadonlyArray): RealmQueryBuilder`](#infield-string-values-readonlyarray-realmquerybuilder)
+* [`in(field: string, values: ReadonlyArray): this`](#infield-string-values-readonlyarrayany-this)
 
-* [`distinct(...fields: string[]): RealmQueryBuilder`](#distinctfields-string-realmquerybuilder)
+* [`distinct(...fields: string[]): this`](#distinctfields-string-this)
 
-* [`sorted(field: string, order?: RealmQuerySort): RealmQueryBuilder`](#sortedfield-string-order-realmquerysort-realmquerybuilder)
+* [`sorted(field: string, order?: RealmQuerySort): this`](#sortedfield-string-order-realmquerysort-this)
 
-* [`limit(limit: number): RealmQueryBuilder`](#limitlimit-number-realmquerybuilder)
+* [`limit(limit: number): this`](#limitlimit-number-this)
 
 * [`findBy(field: string, value: any): T | undefined`](#findbyfield-string-value-any-t--undefined)
 
 * [`size(): number`](#size-number)
 
-* [`min(property?: string): V | null`](#minproperty-string-v--null)
+* [`min(property?: string): V | null`](#minv-extends-realmnumericvaluetypeproperty-string-v--null)
 
-* [`max(property?: string): V | null`](#maxproperty-string-v--null)
+* [`max(property?: string): V | null`](#maxv-extends-realmnumericvaluetypeproperty-string-v--null)
 
 * [`sum(property?: string): number | null`](#sumproperty-string-number--null)
 
 * [`avg(property?: string): number`](#avgproperty-string-number)
 
-* [`merge(query: RealmQueryBuilder): RealmQueryBuilder`](#mergequery-realmquerybuilder-realmquerybuilder)
+* [`merge(query: RealmQueryBuilder): this`](#mergequery-realmquerybuildert-this)
 
-* [`result(): Realm.Results`](#result-realmresults)
+* [`result(): Realm.Results`](#result-realmresultst)
 
 
-### `clone(): RealmQueryBuilder<T>`
+#### `clone(): this`
 Create a clone of the current object
 
-### `where(field: string, condition: RealmConditionalOperator, value: any): RealmQueryBuilder<T>`
+#### `where(field: string, condition: RealmConditionalOperator, value: any): this`
 Add condition
 
-### `equalTo(field: string, value: any, caseInsensitive?: boolean): RealmQueryBuilder<T>`
-Alias to [`where(field, '==', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert), if `caseInsensitive: true` the operador applied will be `==[c]`
+#### `equalTo(field: string, value: any, caseInsensitive?: boolean): this`
+Alias to [`where(field, '==', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `==[c]`
 
-### `notEqualTo(field: string, value: any, caseInsensitive?: boolean): RealmQueryBuilder<T>`
-Alias to [`where(field, '!=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert), if `caseInsensitive: true` the operador applied will be `!=[c]`
+#### `notEqualTo(field: string, value: any, caseInsensitive?: boolean): this`
+Alias to [`where(field, '!=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `!=[c]`
 
-### `like(field: string, value: string, caseInsensitive?: boolean): RealmQueryBuilder<T>`
-Alias to [`where(field, 'LIKE', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert), if `caseInsensitive: true` the operador applied will be `LIKE[c]`
+#### `like(field: string, value: string, caseInsensitive?: boolean): this`
+Alias to [`where(field, 'LIKE', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `LIKE[c]`
 
-### `contains(field: string, value: string, caseInsensitive?: boolean): RealmQueryBuilder<T>`
-Alias to [`where(field, 'CONTAINS', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert), if `caseInsensitive: true` the operador applied will be `CONTAINS[c]`
+#### `contains(field: string, value: string, caseInsensitive?: boolean): this`
+Alias to [`where(field, 'CONTAINS', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `CONTAINS[c]`
 
-### `beginsWith(field: string, value: string, caseInsensitive?: boolean): RealmQueryBuilder<T>`
-Alias to [`where(field, 'BEGINSWITH', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert), if `caseInsensitive` `true` the operador applied will be `BEGINSWITH[c]`
+#### `beginsWith(field: string, value: string, caseInsensitive?: boolean): this`
+Alias to [`where(field, 'BEGINSWITH', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive` `true` the operador applied will be `BEGINSWITH[c]`
   
 
-### `endsWith(field: string, value: string, caseInsensitive?: boolean): RealmQueryBuilder<T>`
-Alias to [`where(field, 'ENDSWITH', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert), if `caseInsensitive: true` the operador applied will be `ENDSWITH[c]`
+#### `endsWith(field: string, value: string, caseInsensitive?: boolean): this`
+Alias to [`where(field, 'ENDSWITH', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `ENDSWITH[c]`
 
-### `greaterThan(field: string, value: RealmNumericValueType): RealmQueryBuilder<T>`
-Alias to [`where(field, '>', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert)
+#### `greaterThan(field: string, value: RealmNumericValueType): this`
+Alias to [`where(field, '>', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this)
 
-### `greaterThanOrEqualTo(field: string, value: RealmNumericValueType): RealmQueryBuilder<T>`
-Alias to [`where(field, '>=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert)
+#### `greaterThanOrEqualTo(field: string, value: RealmNumericValueType): this`
+Alias to [`where(field, '>=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this)
 
-### `lessThan(field: string, value: RealmNumericValueType): RealmQueryBuilder<T>`
-Alias to [`where(field, '<', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert)
+#### `lessThan(field: string, value: RealmNumericValueType): this`
+Alias to [`where(field, '<', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this)
 
-### `lessThanOrEqualTo(field: string, value: RealmNumericValueType): RealmQueryBuilder<T>`
-Alias to [`where(field, '<=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert)
+#### `lessThanOrEqualTo(field: string, value: RealmNumericValueType): this`
+Alias to [`where(field, '<=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this)
 
-### `between(field: string, start: RealmNumericValueType, end: RealmNumericValueType): RealmQueryBuilder<T>`
+#### `between(field: string, start: RealmNumericValueType, end: RealmNumericValueType): this`
 Between condition, same as:
 ```ts
 realmQueryBuilder(object)
@@ -172,17 +172,17 @@ realmQueryBuilder(object)
   .endGroup();
 ```
 
-### `or(): RealmQueryBuilder<T>`
+#### `or(): this`
 Join previous and next conditions with `OR` operator
 
-### `and(): RealmQueryBuilder<T>`
+#### `and(): this`
 Join previous and next conditions with `AND` operator, the default operator is `AND`
 
-### `beginGroup(): RealmQueryBuilder<T>`
-Begin the group (`left parenthesis`)
+#### `beginGroup(): this`
+Begin the group (left parenthesis)
 
-### `endGroup(): RealmQueryBuilder<T>`
-Begin the group (`right parenthesis`)
+#### `endGroup(): this`
+Begin the group (right parenthesis)
 
 exemple
 ```ts
@@ -200,10 +200,9 @@ The same as:
 realm.objects('User').filtered('active == $0 AND (canWrite == $1 OR admin == $2)', true, true, true)
 ```
 
-### `in(field: string, values: ReadonlyArray<any>): RealmQueryBuilder<T>`
+#### `in(field: string, values: ReadonlyArray<any>): this`
 In comparison, the realm.js don't support `IN` operator, it is generate with `OR`.
-<!-- TODO: Add link to result method -->
-The query can be slow when filters are applied ([result](#result)) if has much values or/and register on DB
+The query can be slow when filters are applied ([result](#result-realmresultst)) if has much values or/and register on DB
 
 Executed:
 ```ts
@@ -221,37 +220,36 @@ The same as:
 realm.objects('User').filtered('(id == $0 OR id == $1 OR id == $2)', 11, 21, 34)
 ```
 
-### `distinct(...fields: string[]): RealmQueryBuilder<T>`
+#### `distinct(...fields: string[]): this`
 Add `DISTINCT` suffix, see: [Realm Query Language](https://www.mongodb.com/docs/realm/reference/realm-query-language/#sort--distinct--limit)
 
-### `sorted(field: string, order?: RealmQuerySort): RealmQueryBuilder<T>`
+#### `sorted(field: string, order?: RealmQuerySort): this`
 Call `sorted` method, see: [sorted](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#sorted)
 
-### `limit(limit: number): RealmQueryBuilder<T>`
+#### `limit(limit: number): this`
 Add `LIMIT` suffix, see: [Realm Query Language](https://www.mongodb.com/docs/realm/reference/realm-query-language/#sort--distinct--limit)
 
 
-### `findBy(field: string, value: any): T | undefined`
-Apply the [`where(field, '==', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-realmquerybuildert) and return the first value.
+#### `findBy(field: string, value: any): T | undefined`
+Apply the [`where(field, '==', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this) and return the first value.
 
-<!-- TODO: Adicionar link para a doc do `result` -->
-### `size(): number`
-Query the date and get results size, alias to `result().length`
+#### `size(): number`
+Query the date and get results size, alias to [result().length](#and-realmquerybuildert)
 
 
-### `min<V extends RealmNumericValueType>(property?: string): V | null`
+#### `min<V extends RealmNumericValueType>(property?: string): V | null`
 Call [realm.js min](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#min)
 
-### `max<V extends RealmNumericValueType>(property?: string): V | null`
+#### `max<V extends RealmNumericValueType>(property?: string): V | null`
 Call [realm.js max](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#max)
 
-### `sum(property?: string): number | null`
+#### `sum(property?: string): number | null`
 Call [realm.js sum](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#sum)
 
-### `avg(property?: string): number`
+#### `avg(property?: string): number`
 Call [realm.js avg](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#avg)
 
-### `merge(query: RealmQueryBuilder<T>): RealmQueryBuilder<T>`
+#### `merge(query: RealmQueryBuilder<T>)): this`
 Merge two `RealmQueryBuilder`
 
 The operators [sorted](#sortedfield-string-order-realmquerysort-realmquerybuildert) and [limit](#limitlimit-number-realmquerybuildert) are not merged
@@ -277,5 +275,5 @@ The same as:
 realm.objects('User').filtered('age >= $0 OR (active == $1 AND admin == $2) LIMIT(20)', 18, true, false)
 ```
 
-### `result(): Realm.Results<T>`
+#### `result(): Realm.Results<T>`
 Execute the query with setted params (filters, distinct, limit, etc)
