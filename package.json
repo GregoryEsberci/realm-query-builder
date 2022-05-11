@@ -24,21 +24,15 @@
   },
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "files": [
-    "dist/index.js",
-    "dist/index.d.ts"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "yarn clean && yarn compile",
     "checktypes": "tsc --noEmit",
     "clean": "rm -rf ./dist",
-    "compile": "yarn compile/js && yarn compile/types",
-    "compile/js": "tsc",
-    "compile/types": "tsc --declaration --emitDeclarationOnly",
+    "compile": "tsc --declaration",
     "lint": "eslint . --ignore-path .gitignore",
     "prepublish": "yarn build",
-    "pretest": "yarn clean && yarn compile/js",
-    "test": "jest test ./dist"
+    "test": "jest test"
   },
   "dependencies": {},
   "devDependencies": {
@@ -53,6 +47,7 @@
     "eslint-plugin-jest": "^26.1.5",
     "jest": "^28.0.3",
     "realm": ">=10.0.0",
+    "ts-jest": "^28.0.2",
     "typescript": "^4.6.4"
   },
   "peerDependencies": {

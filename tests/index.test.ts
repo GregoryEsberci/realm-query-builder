@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Realm from 'realm';
-import realmQueryBuilder, { RealmConditionalOperator, RealmQueryBuilder } from './index';
-
-// TODO: Transpile the test using Jest, dont make it manual
+import realmQueryBuilder, { RealmConditionalOperator, RealmQueryBuilder } from '../src/index';
 
 type DataType = { field: string; };
 let fakeRealmResults: jest.Mocked<Realm.Results<DataType> & DataType[]>;
