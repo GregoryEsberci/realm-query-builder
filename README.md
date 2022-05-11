@@ -37,7 +37,12 @@ realm.objects('User').filtered('active == $0 AND age >= $1 AND (country == $2 OR
 ```ts
 import { RealmQueryBuilder } from 'realm-query-builder';
 
-class UserQuery extends RealmQueryBuilder {
+type User = {
+  age: number,
+  active: boolean,
+}
+
+class UserQuery extends RealmQueryBuilder<User & Realm.Object> {
   active() {
     return this.equalTo('active', true);
   }
@@ -47,7 +52,7 @@ class UserQuery extends RealmQueryBuilder {
   }
 }
 
-const userQuery = () =>  new UserQuery(realm.objects('User'));
+const userQuery = () =>  new UserQuery(realm.objects<User>('User'));
 
 userQuery()
   .active()
