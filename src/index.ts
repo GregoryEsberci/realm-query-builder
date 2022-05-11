@@ -32,20 +32,20 @@ const DEFAULT_OPERATOR: RealmLogicOperator = 'AND';
 const INITIAL_GROUP_END = -1;
 
 export class RealmQueryBuilder<T = any> {
-  private realmResult: Realm.Results<T>;
+  private _realmResult: Realm.Results<T>;
 
-  private distinctFields: ReadonlyArray<string> = [];
+  private _distinctFields: ReadonlyArray<string> = [];
 
-  private groups: ReadonlyArray<Readonly<Group>> = [];
+  private _groups: ReadonlyArray<Readonly<Group>> = [];
 
-  private filters: ReadonlyArray<Filter> = [];
+  private _filters: ReadonlyArray<Filter> = [];
 
-  private operator: RealmLogicOperator | undefined = undefined;
+  private _operator: RealmLogicOperator | undefined = undefined;
 
-  private resultLimit: undefined | number = undefined;
+  private _resultLimit: undefined | number = undefined;
 
   constructor(realmResults: Realm.Results<T>) {
-    this.realmResult = realmResults;
+    this._realmResult = realmResults;
   }
 
   clone() {
@@ -208,7 +208,7 @@ export class RealmQueryBuilder<T = any> {
     const query = this._getQuery();
     const values = this._getQueryValues();
 
-    return this.realmResult.filtered(query, ...values);
+    return this._realmResult.filtered(query, ...values);
   }
 
   private _merge(query: RealmQueryBuilder<T>) {
@@ -226,9 +226,9 @@ export class RealmQueryBuilder<T = any> {
    * @returns
    */
   private _mergeGroups(query: RealmQueryBuilder<T>) {
-    const newGroups = query.groups.map(
+    const newGroups = query._groups.map(
       (group) => {
-        const initAt = this.filters.length;
+        const initAt = this._filters.length;
 
         const start = group.start + initAt;
         const end = group.end + initAt;
@@ -237,28 +237,28 @@ export class RealmQueryBuilder<T = any> {
       },
     );
 
-    this.groups = [...this.groups, ...newGroups];
+    this._groups = [...this._groups, ...newGroups];
 
     return this;
   }
 
   private _mergeFilters(query: RealmQueryBuilder<T>) {
-    if (query.filters.length) {
-      query.filters[0].logicalOperator = this.operator || DEFAULT_OPERATOR;
-      this.filters = [...this.filters, ...query.filters];
+    if (query._filters.length) {
+      query._filters[0].logicalOperator = this._operator || DEFAULT_OPERATOR;
+      this._filters = [...this._filters, ...query._filters];
     }
 
     return this;
   }
 
   private _mergeDistinctFields(query: RealmQueryBuilder<T>) {
-    this.distinctFields = [...this.distinctFields, ...query.distinctFields];
+    this._distinctFields = [...this._distinctFields, ...query._distinctFields];
 
     return this;
   }
 
   private _limit(limit: number) {
-    this.resultLimit = limit;
+    this._resultLimit = limit;
 
     return this;
   }
@@ -266,20 +266,20 @@ export class RealmQueryBuilder<T = any> {
   private _sorted(field: string, order?: RealmQuerySort) {
     const isDescending = order === 'desc';
 
-    this.realmResult = this.realmResult.sorted(field, isDescending);
+    this._realmResult = this._realmResult.sorted(field, isDescending);
 
     return this;
   }
 
   private _getQueryFilter() {
-    if (this.filters.length === 0) {
+    if (this._filters.length === 0) {
       return 'TRUEPREDICATE';
     }
 
-    return this.filters.reduce((query, criteria, index) => {
+    return this._filters.reduce((query, criteria, index) => {
       const predicate = index === 0 ? undefined : criteria.logicalOperator;
-      const beginGroups = this.groups.filter((group) => group.start === index);
-      const endGroups = this.groups.filter((group) => group.end === index);
+      const beginGroups = this._groups.filter((group) => group.start === index);
+      const endGroups = this._groups.filter((group) => group.end === index);
 
       if (predicate) query += ` ${predicate} `;
 
@@ -294,12 +294,12 @@ export class RealmQueryBuilder<T = any> {
   private _getQuerySuffix() {
     let suffix = '';
 
-    if (this.distinctFields.length) {
-      suffix += ` DISTINCT(${this.distinctFields.join(',')})`;
+    if (this._distinctFields.length) {
+      suffix += ` DISTINCT(${this._distinctFields.join(',')})`;
     }
 
-    if (typeof this.resultLimit === 'number') {
-      suffix += ` LIMIT(${this.resultLimit})`;
+    if (typeof this._resultLimit === 'number') {
+      suffix += ` LIMIT(${this._resultLimit})`;
     }
 
     return suffix;
@@ -314,14 +314,14 @@ export class RealmQueryBuilder<T = any> {
   }
 
   private _getQueryValues() {
-    return this.filters.map(({ value }) => value);
+    return this._filters.map(({ value }) => value);
   }
 
   private _beginGroup() {
-    this.groups = [
-      ...this.groups,
+    this._groups = [
+      ...this._groups,
       {
-        start: this.filters.length,
+        start: this._filters.length,
         end: INITIAL_GROUP_END,
       },
     ];
@@ -330,7 +330,7 @@ export class RealmQueryBuilder<T = any> {
   }
 
   private _endGroup() {
-    const currentGroupIndex = this.groups
+    const currentGroupIndex = this._groups
       .map((group) => group.end)
       .lastIndexOf(INITIAL_GROUP_END);
 
@@ -338,37 +338,37 @@ export class RealmQueryBuilder<T = any> {
       throw new Error('Group not started');
     }
 
-    if (this.filters.length === 0) {
+    if (this._filters.length === 0) {
       throw new Error('Invalid group, no filter found');
     }
 
-    const groupsClone = [...this.groups];
-    const end = this.filters.length - 1;
+    const groupsClone = [...this._groups];
+    const end = this._filters.length - 1;
 
     groupsClone[currentGroupIndex] = {
       ...groupsClone[currentGroupIndex],
       end,
     };
 
-    this.groups = groupsClone;
+    this._groups = groupsClone;
 
     return this;
   }
 
   private _resetOperator() {
-    this.operator = undefined;
+    this._operator = undefined;
 
     return this;
   }
 
   private _setOperator(operator: RealmLogicOperator) {
-    this.operator = operator;
+    this._operator = operator;
 
     return this;
   }
 
   private _distinct(...fields: string[]) {
-    this.distinctFields = [...fields];
+    this._distinctFields = [...fields];
 
     return this;
   }
@@ -378,13 +378,13 @@ export class RealmQueryBuilder<T = any> {
     condition: RealmConditionalOperator,
     value: any,
   ) {
-    this.filters = [
-      ...this.filters,
+    this._filters = [
+      ...this._filters,
       {
         field,
         condition,
         value,
-        logicalOperator: this.operator || DEFAULT_OPERATOR,
+        logicalOperator: this._operator || DEFAULT_OPERATOR,
       },
     ];
 

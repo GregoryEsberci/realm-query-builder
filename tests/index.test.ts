@@ -20,14 +20,6 @@ describe('methods', () => {
     instance = realmQueryBuilder(fakeRealmResults);
   });
 
-  it('create', () => {
-    instance.result();
-
-    expect(instance).toBeInstanceOf(RealmQueryBuilder);
-    // @ts-ignore => private attribute
-    expect(instance.realmResult).toBe(fakeRealmResults);
-  });
-
   it('clone', () => {
     const instanceClone = instance.clone();
 
