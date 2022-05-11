@@ -375,6 +375,51 @@ describe('methods', () => {
     expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
   });
 
+  describe('first', () => {
+    it('found', () => {
+      const expectedResult = { field: 'value' };
+
+      fakeRealmResults.push(expectedResult);
+      fakeRealmResults.push({ field: 'other value' });
+
+      const result = instance.fist();
+
+      expect(result).toBe(expectedResult);
+
+      expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
+    });
+
+    it('empty result', () => {
+      const result = instance.fist();
+
+      expect(result).toBeUndefined();
+
+      expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('last', () => {
+    it('found', () => {
+      const expectedResult = { field: 'value' };
+
+      fakeRealmResults.push({ field: 'other value' });
+      fakeRealmResults.push(expectedResult);
+      const result = instance.last();
+
+      expect(result).toBe(expectedResult);
+
+      expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
+    });
+
+    it('empty result', () => {
+      const result = instance.last();
+
+      expect(result).toBeUndefined();
+
+      expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('findBy', () => {
     it('found', () => {
       const cloneSpy = jest.spyOn(instance, 'clone');
@@ -386,7 +431,7 @@ describe('methods', () => {
       expect(cloneSpy).toHaveBeenCalledTimes(1);
       expect(result).toBe(expectedResult);
 
-      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0 LIMIT(1)', 'value0');
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0', 'value0');
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
     });
 
@@ -398,7 +443,7 @@ describe('methods', () => {
       expect(cloneSpy).toHaveBeenCalledTimes(1);
       expect(result).toBeUndefined();
 
-      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0 LIMIT(1)', 'value0');
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0', 'value0');
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
     });
   });

@@ -108,6 +108,10 @@ realm.objects('User').filtered('active == $0 AND age == $1 DISTINCT(country)', t
 
 * [`limit(limit: number): this`](#limitlimit-number-this)
 
+* [`first(field: string, value: any): T | undefined`](#last-t--undefined)
+
+* [`last(field: string, value: any): T | undefined`](#first-t--undefined)
+
 * [`findBy(field: string, value: any): T | undefined`](#findbyfield-string-value-any-t--undefined)
 
 * [`size(): number`](#size-number)
@@ -145,7 +149,6 @@ Alias to [`where(field, 'CONTAINS', value)`](#wherefield-string-condition-realmc
 
 #### `beginsWith(field: string, value: string, caseInsensitive?: boolean): this`
 Alias to [`where(field, 'BEGINSWITH', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive` `true` the operador applied will be `BEGINSWITH[c]`
-  
 
 #### `endsWith(field: string, value: string, caseInsensitive?: boolean): this`
 Alias to [`where(field, 'ENDSWITH', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `ENDSWITH[c]`
@@ -229,6 +232,11 @@ Call `sorted` method, see: [sorted](https://www.mongodb.com/docs/realm-sdks/js/l
 #### `limit(limit: number): this`
 Add `LIMIT` suffix, see: [Realm Query Language](https://www.mongodb.com/docs/realm/reference/realm-query-language/#sort--distinct--limit)
 
+#### `first(): T | undefined`
+Get first result.
+
+#### `last(): T | undefined`
+Get last result.
 
 #### `findBy(field: string, value: any): T | undefined`
 Apply the [`where(field, '==', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this) and return the first value.

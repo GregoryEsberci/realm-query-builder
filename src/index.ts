@@ -171,13 +171,18 @@ export class RealmQueryBuilder<T = any> {
     return this.clone()._limit(limit);
   }
 
-  findBy(field: string, value: any) {
-    const data = this.clone()
-      ._where(field, '==', value)
-      ._limit(1)
-      .result();
+  fist(): T | undefined {
+    return this.result()[0];
+  }
 
-    return data.length === 0 ? undefined : data[0];
+  last(): T | undefined {
+    const result = this.result();
+
+    return result[result.length - 1];
+  }
+
+  findBy(field: string, value: any) {
+    return this.clone()._where(field, '==', value).fist();
   }
 
   size() {
