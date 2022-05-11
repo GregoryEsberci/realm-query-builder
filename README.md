@@ -13,6 +13,8 @@ yarn add realm-query-builder
 
 
 ## Exemple
+
+### Using realmQueryBuilder directly
 ```ts
 import realmQueryBuilder from 'realm-query-builder';
 
@@ -23,10 +25,43 @@ realmQueryBuilder(realm.objects('User'))
   .distinct('name')
   .result();
 ```
-what is executed:
+The same as:
 ```ts
 realm.objects('User').filtered('active == $0 AND age >= $1 AND (country == $2 OR country == $3 OR country == $4) DISTINCT(name)', true, 18, 'BR', 'AR', 'US')
 ```
+
+-------
+
+### Extending
+
+```ts
+import { RealmQueryBuilder } from 'realm-query-builder';
+
+class UserQuery extends RealmQueryBuilder {
+  active() {
+    return this.equalTo('active', true);
+  }
+
+  byAge(age: number) {
+    return this.equalTo('age', age);
+  }
+}
+
+const userQuery = () =>  new UserQuery(realm.objects('User'));
+
+userQuery()
+  .active()
+  .byAge(18)
+  .distinct('country')
+  .result();
+```
+
+The same as:
+```ts
+realm.objects('User').filtered('active == $0 AND age == $1 DISTINCT(country)', true, 18);
+```
+
+
 
 
 ## API
@@ -160,7 +195,7 @@ realmQueryBuilder(realm.objects('User'))
   .endGroup()
   .result();
 ```
-What is executed:
+The same as:
 ```ts
 realm.objects('User').filtered('active == $0 AND (canWrite == $1 OR admin == $2)', true, true, true)
 ```
@@ -181,7 +216,7 @@ realmQueryBuilder(realm.objects('User'))
   .in('id', [11, 21, 34])
   .result()
 ```
-What is executed:
+The same as:
 ```ts
 realm.objects('User').filtered('(id == $0 OR id == $1 OR id == $2)', 11, 21, 34)
 ```
@@ -237,7 +272,7 @@ const queryB =  realmQueryBuilder(realm.objects('User'))
   .endGroup()
   .result();
 ```
-What is executed:
+The same as:
 ```ts
 realm.objects('User').filtered('age >= $0 OR (active == $1 AND admin == $2) LIMIT(20)', 18, true, false)
 ```
