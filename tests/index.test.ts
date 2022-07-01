@@ -118,7 +118,7 @@ describe('methods', () => {
 
     expect(newInstance).not.toBe(instance);
     expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
-    expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field1 == $0 AND (field2 >= $1 AND field2 <= $2)', 'value1', 5, 10);
+    expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field1 == $0 AND  ( field2 >= $1 AND field2 <= $2 ) ', 'value1', 5, 10);
     expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
   });
 
@@ -149,7 +149,7 @@ describe('methods', () => {
 
       expect(newInstance).not.toBe(instance);
       expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
-      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0 OR (field1 == $1)', 'value0', 'value1');
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0 OR  ( field1 == $1 ) ', 'value0', 'value1');
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
     });
   });
@@ -181,7 +181,7 @@ describe('methods', () => {
 
       expect(newInstance).not.toBe(instance);
       expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
-      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0 AND (field1 == $1)', 'value0', 'value1');
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0 AND  ( field1 == $1 ) ', 'value0', 'value1');
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
     });
   });
@@ -203,7 +203,7 @@ describe('methods', () => {
       expect(newInstance).not.toBe(instance);
       expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
       expect(fakeRealmResults.filtered).toHaveBeenCalledWith(
-        'field0 == $0 OR (field1 == $1 AND field2 == $2)',
+        'field0 == $0 OR  ( field1 == $1 AND field2 == $2 ) ',
         'value0',
         'value1',
         'value2',
@@ -230,7 +230,7 @@ describe('methods', () => {
       expect(newInstance).not.toBe(instance);
       expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
       expect(fakeRealmResults.filtered).toHaveBeenCalledWith(
-        'field0 == $0 AND (field1 == $1 OR field2 == $2) AND (field3 == $3)',
+        'field0 == $0 AND  ( field1 == $1 OR field2 == $2 )  AND  ( field3 == $3 ) ',
         ...generateValues(4),
       );
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
@@ -258,20 +258,54 @@ describe('methods', () => {
       expect(newInstance).not.toBe(instance);
       expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
       expect(fakeRealmResults.filtered).toHaveBeenCalledWith(
-        'field0 == $0 AND ((field1 == $1 OR field2 == $2) AND (field3 == $3 AND field4 == $4))',
+        'field0 == $0 AND  (  ( field1 == $1 OR field2 == $2 )  AND  ( field3 == $3 AND field4 == $4 )  ) ',
         ...generateValues(5),
       );
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
     });
+  });
 
-    describe('error', () => {
-      it('not started', () => {
-        expect(() => instance.endGroup()).toThrow('Group not started');
-      });
+  describe('not', () => {
+    it('basic', () => {
+      const newInstance = instance
+        .not()
+        .equalTo('field0', 'value0');
 
-      it('without filters', () => {
-        expect(() => instance.beginGroup().endGroup()).toThrow('Invalid group, no filter found');
-      });
+      newInstance.result();
+
+      expect(newInstance).not.toBe(instance);
+      expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith(' NOT field0 == $0', 'value0');
+      expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
+    });
+
+    it('with group', () => {
+      /* eslint-disable indent */
+      const newInstance = instance
+        .equalTo('field0', 'value0')
+          .beginGroup()
+            .not()
+            .equalTo('field1', 'value1')
+            .or()
+            .equalTo('field2', 'value2')
+          .endGroup()
+          .not()
+          .beginGroup()
+            .equalTo('field3', 'value3')
+            .or()
+            .equalTo('field4', 'value4')
+          .endGroup();
+      /* eslint-enable indent */
+
+      newInstance.result();
+
+      expect(newInstance).not.toBe(instance);
+      expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith(
+        'field0 == $0 AND  (  NOT field1 == $1 OR field2 == $2 )  AND  NOT  ( field3 == $3 OR field4 == $4 ) ',
+        ...generateValues(5),
+      );
+      expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -298,7 +332,7 @@ describe('methods', () => {
       expect(newInstance).not.toBe(instance);
       expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
       expect(fakeRealmResults.filtered).toHaveBeenCalledWith(
-        'field0 == $0 AND (field1 == $1) AND field2 == $2',
+        'field0 == $0 AND  ( field1 == $1 )  AND field2 == $2',
         ...generateValues(3),
       );
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
@@ -314,7 +348,7 @@ describe('methods', () => {
       expect(newInstance).not.toBe(instance);
       expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
       expect(fakeRealmResults.filtered).toHaveBeenCalledWith(
-        'field0 == $0 AND (field1 == $1 OR field1 == $2 OR field1 == $3)',
+        'field0 == $0 AND  ( field1 == $1 OR field1 == $2 OR field1 == $3 ) ',
         ...generateValues(4),
       );
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
@@ -537,7 +571,35 @@ describe('methods', () => {
 
       expect(newInstance).not.toBe(instance);
       expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
-      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('(field0 == $0 AND field1 == $1) OR (field2 == $2 OR (field3 == $3 AND field4 == $4))', 'value0', 'value1', 'value2', 'value3', 'value4');
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith(
+        ' ( field0 == $0 AND field1 == $1 )  OR  ( field2 == $2 OR  ( field3 == $3 AND field4 == $4 )  ) ',
+        ...generateValues(5),
+      );
+      expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
+    });
+
+    it('not', () => {
+      const toMerge = realmQueryBuilder(fakeRealmResults)
+        .not()
+        .equalTo('field2', 'value2');
+
+      const newInstance = instance
+        .equalTo('field0', 'value0')
+        .not()
+        .equalTo('field1', 'value1')
+        .not()
+        .beginGroup()
+        .merge(toMerge)
+        .endGroup();
+
+      newInstance.result();
+
+      expect(newInstance).not.toBe(instance);
+      expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith(
+        'field0 == $0 AND  NOT field1 == $1 AND  NOT  (  NOT field2 == $2 ) ',
+        ...generateValues(3),
+      );
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
     });
   });

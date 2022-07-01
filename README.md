@@ -107,6 +107,8 @@ realm.objects('User').filtered('active == $0 AND age == $1 DISTINCT(country)', t
 
 * [`in(field: string, values: ReadonlyArray): this`](#infield-string-values-readonlyarrayany-this)
 
+* [`not()`](#not)
+
 * [`distinct(...fields: string[]): this`](#distinctfields-string-this)
 
 * [`sorted(field: string, order?: RealmQuerySort): this`](#sortedfield-string-order-realmquerysort-this)
@@ -216,6 +218,9 @@ Executed:
 ```ts
 realResult.filtered('(field == $0 OR field == $1 OR field == $N)', values[0], values[1], values['N'])
 ```
+
+### `not()`
+Implements [not operador](https://www.mongodb.com/docs/realm/reference/realm-query-language/#logical-operators) for the next operation
 
 Exemple: 
 ```ts

@@ -23,20 +23,25 @@ type Filter = {
   logicalOperator: RealmLogicOperator,
 }
 
-type Group = {
-  start: number,
-  end: number,
+type Prefix = {
+  value: 'NOT' | '(',
+  at: number
+}
+
+type Suffix = {
+  value: ')'
+  at: number
 }
 
 const DEFAULT_OPERATOR: RealmLogicOperator = 'AND';
-const INITIAL_GROUP_END = -1;
-
 export class RealmQueryBuilder<T = any> {
   private _realmResult: Realm.Results<T>;
 
   private _distinctFields: ReadonlyArray<string> = [];
 
-  private _groups: ReadonlyArray<Readonly<Group>> = [];
+  private _prefixes: Prefix[] = [];
+
+  private _suffixes: Suffix[] = [];
 
   private _filters: ReadonlyArray<Filter> = [];
 
@@ -143,6 +148,10 @@ export class RealmQueryBuilder<T = any> {
     return this.clone()._endGroup();
   }
 
+  not() {
+    return this.clone()._not();
+  }
+
   in(field: string, values: ReadonlyArray<any>) {
     const thisClone = this.clone();
 
@@ -220,7 +229,8 @@ export class RealmQueryBuilder<T = any> {
     const queryClone = query.clone();
 
     return this
-      ._mergeGroups(queryClone)
+      ._mergePrefixes(queryClone)
+      ._mergeSuffixes(queryClone)
       ._mergeFilters(queryClone)
       ._mergeDistinctFields(queryClone);
   }
@@ -230,19 +240,33 @@ export class RealmQueryBuilder<T = any> {
    * @param query
    * @returns
    */
-  private _mergeGroups(query: RealmQueryBuilder<T>) {
-    const newGroups = query._groups.map(
+  private _mergePrefixes(query: RealmQueryBuilder<T>) {
+    const newPrefixSuffixes = query._prefixes.map(
       (group) => {
         const initAt = this._filters.length;
-
-        const start = group.start + initAt;
-        const end = group.end + initAt;
-
-        return ({ start, end });
+        return { ...group, at: group.at + initAt };
       },
     );
 
-    this._groups = [...this._groups, ...newGroups];
+    this._prefixes = [...this._prefixes, ...newPrefixSuffixes];
+
+    return this;
+  }
+
+  /**
+   * CAUTION: Needs to be executed before _mergeFilters
+   * @param query
+   * @returns
+   */
+  private _mergeSuffixes(query: RealmQueryBuilder<T>) {
+    const newPrefixSuffixes = query._suffixes.map(
+      (group) => {
+        const initAt = this._filters.length;
+        return { ...group, at: group.at + initAt };
+      },
+    );
+
+    this._suffixes = [...this._suffixes, ...newPrefixSuffixes];
 
     return this;
   }
@@ -281,16 +305,26 @@ export class RealmQueryBuilder<T = any> {
       return 'TRUEPREDICATE';
     }
 
+    const getPrefix = (index: number) => this._prefixes.reduce((acc, prefix) => {
+      if (prefix.at !== index) return acc;
+
+      return `${acc} ${prefix.value} `;
+    }, '');
+
+    const getSuffix = (index: number) => this._suffixes.reduce((acc, suffix) => {
+      if (suffix.at !== index) return acc;
+
+      return `${acc} ${suffix.value} `;
+    }, '');
+
     return this._filters.reduce((query, criteria, index) => {
       const predicate = index === 0 ? undefined : criteria.logicalOperator;
-      const beginGroups = this._groups.filter((group) => group.start === index);
-      const endGroups = this._groups.filter((group) => group.end === index);
 
       if (predicate) query += ` ${predicate} `;
 
-      query += '('.repeat(beginGroups.length);
+      query += getPrefix(index);
       query += `${criteria.field} ${criteria.condition} $${index}`;
-      query += ')'.repeat(endGroups.length);
+      query += getSuffix(index);
 
       return query;
     }, '');
@@ -322,42 +356,34 @@ export class RealmQueryBuilder<T = any> {
     return this._filters.map(({ value }) => value);
   }
 
-  private _beginGroup() {
-    this._groups = [
-      ...this._groups,
-      {
-        start: this._filters.length,
-        end: INITIAL_GROUP_END,
-      },
+  private _pushPrefix(value: Prefix['value']) {
+    this._prefixes = [
+      ...this._prefixes,
+      { value, at: this._filters.length },
     ];
 
     return this;
   }
 
-  private _endGroup() {
-    const currentGroupIndex = this._groups
-      .map((group) => group.end)
-      .lastIndexOf(INITIAL_GROUP_END);
-
-    if (currentGroupIndex === -1) {
-      throw new Error('Group not started');
-    }
-
-    if (this._filters.length === 0) {
-      throw new Error('Invalid group, no filter found');
-    }
-
-    const groupsClone = [...this._groups];
-    const end = this._filters.length - 1;
-
-    groupsClone[currentGroupIndex] = {
-      ...groupsClone[currentGroupIndex],
-      end,
-    };
-
-    this._groups = groupsClone;
+  private _pushSuffix(value: Suffix['value']) {
+    this._suffixes = [
+      ...this._suffixes,
+      { value, at: this._filters.length - 1 },
+    ];
 
     return this;
+  }
+
+  private _beginGroup() {
+    return this._pushPrefix('(');
+  }
+
+  private _endGroup() {
+    return this._pushSuffix(')');
+  }
+
+  private _not() {
+    return this._pushPrefix('NOT');
   }
 
   private _resetOperator() {
