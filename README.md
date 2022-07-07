@@ -142,6 +142,12 @@ Create a clone of the current object
 #### `where(field: string, condition: RealmConditionalOperator, value: any): this`
 Add condition
 
+#### `truepredicate(): this`
+A predicate that always evaluates to TRUE
+
+#### `falsepredicate(): this`
+A predicate that always evaluates to FALSE
+
 #### `equalTo(field: string, value: any, caseInsensitive?: boolean): this`
 Alias to [`where(field, '==', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `==[c]`
 
@@ -219,7 +225,7 @@ Executed:
 realResult.filtered('(field == $0 OR field == $1 OR field == $N)', values[0], values[1], values['N'])
 ```
 
-### `not()`
+### `not(): this`
 Implements [not operador](https://www.mongodb.com/docs/realm/reference/realm-query-language/#logical-operators) for the next operation
 
 Exemple: 

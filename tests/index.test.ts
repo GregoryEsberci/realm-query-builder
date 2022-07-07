@@ -42,6 +42,28 @@ describe('methods', () => {
     });
   });
 
+  it('truepredicate', () => {
+    const whereReturn = instance.equalTo('value0', 'value0').or().truepredicate();
+
+    whereReturn.result();
+
+    expect(whereReturn).toBeInstanceOf(RealmQueryBuilder);
+    expect(whereReturn).not.toBe(instance);
+
+    expect(fakeRealmResults.filtered).toHaveBeenCalledWith('value0 == $0 OR TRUEPREDICATE', 'value0');
+  });
+
+  it('falsepredicate', () => {
+    const whereReturn = instance.equalTo('value0', 'value0').or().falsepredicate();
+
+    whereReturn.result();
+
+    expect(whereReturn).toBeInstanceOf(RealmQueryBuilder);
+    expect(whereReturn).not.toBe(instance);
+
+    expect(fakeRealmResults.filtered).toHaveBeenCalledWith('value0 == $0 OR FALSEPREDICATE', 'value0');
+  });
+
   describe('alias of where method', () => {
     let whereMethodSpy: jest.SpyInstance;
 
