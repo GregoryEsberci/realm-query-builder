@@ -339,7 +339,7 @@ describe('methods', () => {
 
       expect(newInstance).not.toBe(instance);
       expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
-      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0', 'value0');
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0 AND FALSEPREDICATE', 'value0');
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
     });
 

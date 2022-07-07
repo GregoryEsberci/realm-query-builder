@@ -173,7 +173,7 @@ export class RealmQueryBuilder<T = any> {
     const thisClone = this.clone();
 
     if (values.length === 0) {
-    if (values.length === 0) return thisClone;
+      return thisClone.falsepredicate();
     }
 
     thisClone._beginGroup();
