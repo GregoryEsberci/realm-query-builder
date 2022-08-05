@@ -324,6 +324,8 @@ export class RealmQueryBuilder<T = any> {
       return 'TRUEPREDICATE';
     }
 
+    let filterIndex = 0;
+
     const getPrefix = (index: number) => this._prefixes.reduce((acc, prefix) => {
       if (prefix.at !== index) return acc;
 
@@ -344,9 +346,10 @@ export class RealmQueryBuilder<T = any> {
       query += getPrefix(index);
 
       if (criteria.type === 'filter') {
-        query += `${criteria.field} ${criteria.condition} $${index}`;
+        query += `${criteria.field} ${criteria.condition} $${filterIndex}`;
+        filterIndex += 1;
       } else if (criteria.type === 'predicate') {
-        query += `${criteria.predicate}`;
+        query += criteria.predicate;
       }
 
       query += getSuffix(index);

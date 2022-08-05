@@ -43,25 +43,33 @@ describe('methods', () => {
   });
 
   it('truepredicate', () => {
-    const whereReturn = instance.equalTo('value0', 'value0').or().truepredicate();
+    const whereReturn = instance
+      .equalTo('value0', 'value0')
+      .or()
+      .truepredicate()
+      .equalTo('value1', 'value1');
 
     whereReturn.result();
 
     expect(whereReturn).toBeInstanceOf(RealmQueryBuilder);
     expect(whereReturn).not.toBe(instance);
 
-    expect(fakeRealmResults.filtered).toHaveBeenCalledWith('value0 == $0 OR TRUEPREDICATE', 'value0');
+    expect(fakeRealmResults.filtered).toHaveBeenCalledWith('value0 == $0 OR TRUEPREDICATE AND value1 == $1', 'value0', 'value1');
   });
 
   it('falsepredicate', () => {
-    const whereReturn = instance.equalTo('value0', 'value0').or().falsepredicate();
+    const whereReturn = instance
+      .equalTo('value0', 'value0')
+      .or()
+      .falsepredicate()
+      .equalTo('value1', 'value1');
 
     whereReturn.result();
 
     expect(whereReturn).toBeInstanceOf(RealmQueryBuilder);
     expect(whereReturn).not.toBe(instance);
 
-    expect(fakeRealmResults.filtered).toHaveBeenCalledWith('value0 == $0 OR FALSEPREDICATE', 'value0');
+    expect(fakeRealmResults.filtered).toHaveBeenCalledWith('value0 == $0 OR FALSEPREDICATE AND value1 == $1', 'value0', 'value1');
   });
 
   describe('alias of where method', () => {
