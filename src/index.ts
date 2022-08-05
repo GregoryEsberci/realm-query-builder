@@ -199,7 +199,7 @@ export class RealmQueryBuilder<T = any> {
     return this.clone()._limit(limit);
   }
 
-  fist(): T | undefined {
+  first(): T | undefined {
     return this.result()[0];
   }
 
@@ -210,7 +210,7 @@ export class RealmQueryBuilder<T = any> {
   }
 
   findBy(field: string, value: any) {
-    return this.clone()._where(field, '==', value).fist();
+    return this.clone()._where(field, '==', value).first();
   }
 
   size() {

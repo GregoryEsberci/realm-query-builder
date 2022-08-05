@@ -446,7 +446,7 @@ describe('methods', () => {
       fakeRealmResults.push(expectedResult);
       fakeRealmResults.push({ field: 'other value' });
 
-      const result = instance.fist();
+      const result = instance.first();
 
       expect(result).toBe(expectedResult);
 
@@ -454,7 +454,7 @@ describe('methods', () => {
     });
 
     it('empty result', () => {
-      const result = instance.fist();
+      const result = instance.first();
 
       expect(result).toBeUndefined();
 
