@@ -1,60 +1,42 @@
 import Realm from 'realm';
+import getQueryFilter from './internal/get-query-filter';
+import {
+  mergeDistinctFields,
+  mergePrefixes,
+  mergeSuffixes,
+  mergeActions,
+} from './internal/merge';
+import type {
+  DeepReadonlyArray,
+  Predicate,
+  Action,
+  Filter,
+  Prefix,
+  Suffix,
+} from './internal/types';
+import {
+  RealmConditionalOperator,
+  RealmNumericValueType,
+  RealmLogicOperator,
+  RealmQuerySort,
+} from './types';
 
-export type RealmQuerySort = 'asc' | 'desc';
-export type RealmStringOperator = 'CONTAINS' | 'CONTAINS[c]'
-  | 'BEGINSWITH' | 'BEGINSWITH[c]'
-  | 'ENDSWITH' | 'ENDSWITH[c]'
-  | 'LIKE' | 'LIKE[c]'
-  | '==' | '==[c]'
-  | '!=' | '!=[c]';
-export type RealmNumberOperator = '>' | '<' | '>=' | '<=';
-export type RealmEqualityOperator = '==' | '!=';
-export type RealmConditionalOperator = RealmNumberOperator
-  | RealmStringOperator
-  | RealmEqualityOperator;
-
-export type RealmLogicOperator = 'AND' | 'OR';
-export type RealmNumericValueType = Date | number;
-
-type Predicate = {
-  type: 'predicate',
-  predicate: 'FALSEPREDICATE' | 'TRUEPREDICATE'
-  logicalOperator: RealmLogicOperator,
-}
-
-type Filter = {
-  type: 'filter',
-  value: any,
-  field: string,
-  condition: RealmConditionalOperator,
-  logicalOperator: RealmLogicOperator,
-}
-
-type Prefix = {
-  value: 'NOT' | '(',
-  at: number
-}
-
-type Suffix = {
-  value: ')'
-  at: number
-}
-
-type Action = Filter | Predicate;
+export * from './types';
 
 const DEFAULT_OPERATOR: RealmLogicOperator = 'AND';
+
 export class RealmQueryBuilder<T = any> {
   private _realmResult: Realm.Results<T>;
 
-  private _distinctFields: ReadonlyArray<string> = [];
+  private _distinctFields: DeepReadonlyArray<string> = [];
 
-  private _prefixes: Prefix[] = [];
+  private _prefixes: DeepReadonlyArray<Prefix> = [];
 
-  private _suffixes: Suffix[] = [];
+  private _suffixes: DeepReadonlyArray<Suffix> = [];
 
-  private _actions: ReadonlyArray<Action> = [];
+  private _actions: DeepReadonlyArray<Action> = [];
 
-  private _operator: RealmLogicOperator | undefined = undefined;
+  private _operator: RealmLogicOperator = DEFAULT_OPERATOR;
 
   private _resultLimit: undefined | number = undefined;
 
@@ -244,63 +226,26 @@ export class RealmQueryBuilder<T = any> {
     return this._realmResult.filtered(query, ...values);
   }
 
+  private _makeMergeData() {
+    return {
+      prefixes: this._prefixes,
+      actions: this._actions,
+      suffixes: this._suffixes,
+      distinctFields: this._distinctFields,
+      operator: this._operator,
+    };
+  }
+
   private _merge(query: RealmQueryBuilder<T>) {
-    const queryClone = query.clone();
+    const data = {
+      current: this._makeMergeData(),
+      received: query._makeMergeData(),
+    };
 
-    return this
-      ._mergePrefixes(queryClone)
-      ._mergeSuffixes(queryClone)
-      ._mergeFilters(queryClone)
-      ._mergeDistinctFields(queryClone);
-  }
-
-  /**
-   * CAUTION: Needs to be executed before _mergeFilters
-   * @param query
-   * @returns
-   */
-  private _mergePrefixes(query: RealmQueryBuilder<T>) {
-    const newPrefixSuffixes = query._prefixes.map(
-      (group) => {
-        const initAt = this._actions.length;
-        return { ...group, at: group.at + initAt };
-      },
-    );
-
-    this._prefixes = [...this._prefixes, ...newPrefixSuffixes];
-
-    return this;
-  }
-
-  /**
-   * CAUTION: Needs to be executed before _mergeFilters
-   * @param query
-   * @returns
-   */
-  private _mergeSuffixes(query: RealmQueryBuilder<T>) {
-    const newPrefixSuffixes = query._suffixes.map(
-      (group) => {
-        const initAt = this._actions.length;
-        return { ...group, at: group.at + initAt };
-      },
-    );
-
-    this._suffixes = [...this._suffixes, ...newPrefixSuffixes];
-
-    return this;
-  }
-
-  private _mergeFilters(query: RealmQueryBuilder<T>) {
-    if (query._actions.length) {
-      query._actions[0].logicalOperator = this._operator || DEFAULT_OPERATOR;
-      this._actions = [...this._actions, ...query._actions];
-    }
-
-    return this;
-  }
-
-  private _mergeDistinctFields(query: RealmQueryBuilder<T>) {
-    this._distinctFields = [...this._distinctFields, ...query._distinctFields];
+    this._prefixes = mergePrefixes(data);
+    this._actions = mergeActions(data);
+    this._suffixes = mergeSuffixes(data);
+    this._distinctFields = mergeDistinctFields(data);
 
     return this;
   }
@@ -320,49 +265,19 @@ export class RealmQueryBuilder<T = any> {
   }
 
   private _getQueryFilter() {
-    if (this._actions.length === 0) {
-      return 'TRUEPREDICATE';
-    }
-
-    let filterIndex = 0;
-
-    const getPrefix = (index: number) => this._prefixes.reduce((acc, prefix) => {
-      if (prefix.at !== index) return acc;
-
-      return `${acc} ${prefix.value} `;
-    }, '');
-
-    const getSuffix = (index: number) => this._suffixes.reduce((acc, suffix) => {
-      if (suffix.at !== index) return acc;
-
-      return `${acc} ${suffix.value} `;
-    }, '');
-
-    return this._actions.reduce((query, criteria, index) => {
-      const predicate = index === 0 ? undefined : criteria.logicalOperator;
-
-      if (predicate) query += ` ${predicate} `;
-
-      query += getPrefix(index);
-
-      if (criteria.type === 'filter') {
-        query += `${criteria.field} ${criteria.condition} $${filterIndex}`;
-        filterIndex += 1;
-      } else if (criteria.type === 'predicate') {
-        query += criteria.predicate;
-      }
-
-      query += getSuffix(index);
-
-      return query;
-    }, '');
+    return getQueryFilter({
+      actions: this._actions,
+      prefixes: this._prefixes,
+      suffixes: this._suffixes,
+    });
   }
 
   private _getQuerySuffix() {
     let suffix = '';
 
     if (this._distinctFields.length) {
-      suffix += ` DISTINCT(${this._distinctFields.join(',')})`;
+      const distinct = this._distinctFields.join(',');
+      suffix += ` DISTINCT(${distinct})`;
     }
 
     if (typeof this._resultLimit === 'number') {
@@ -417,7 +332,7 @@ export class RealmQueryBuilder<T = any> {
   }
 
   private _resetOperator() {
-    this._operator = undefined;
+    this._operator = DEFAULT_OPERATOR;
 
     return this;
   }
@@ -446,7 +361,7 @@ export class RealmQueryBuilder<T = any> {
         field,
         condition,
         value,
-        logicalOperator: this._operator || DEFAULT_OPERATOR,
+        logicalOperator: this._operator,
       },
     ];
 
@@ -463,7 +378,7 @@ export class RealmQueryBuilder<T = any> {
       {
         type: 'predicate',
         predicate,
-        logicalOperator: this._operator || DEFAULT_OPERATOR,
+        logicalOperator: this._operator,
       },
     ];
 

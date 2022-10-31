@@ -41,6 +41,7 @@ module.exports = {
     'no-useless-constructor': 'off',
     'no-underscore-dangle': 'off',
     'no-param-reassign': 'off',
+    'no-use-before-define': 'off',
 
     'import/extensions': 'off',
 
