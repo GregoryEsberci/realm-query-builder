@@ -1,7 +1,7 @@
 import Realm from 'realm';
 import getQueryFilter from './internal/get-query-filter';
 import {
-  mergeDistinctFields,
+  mergeDistinctProperties,
   mergePrefixes,
   mergeSuffixes,
   mergeActions,
@@ -28,7 +28,7 @@ const DEFAULT_OPERATOR: RealmLogicOperator = 'AND';
 export class RealmQueryBuilder<T = any> {
   private _realmResult: Realm.Results<T>;
 
-  private _distinctFields: DeepReadonlyArray<string> = [];
+  private _distinctProperties: DeepReadonlyArray<string> = [];
 
   private _prefixes: DeepReadonlyArray<Prefix> = [];
 
@@ -49,11 +49,11 @@ export class RealmQueryBuilder<T = any> {
   }
 
   where(
-    field: string,
+    property: string,
     operator: RealmConditionalOperator,
     value: any,
   ) {
-    return this.clone()._where(field, operator, value);
+    return this.clone()._where(property, operator, value);
   }
 
   truepredicate() {
@@ -64,70 +64,70 @@ export class RealmQueryBuilder<T = any> {
     return this.clone()._predicate('FALSEPREDICATE');
   }
 
-  equalTo(field: string, value: any, caseInsensitive?: boolean) {
+  equalTo(property: string, value: any, caseInsensitive?: boolean) {
     const operator = caseInsensitive ? '==[c]' : '==';
 
-    return this.where(field, operator, value);
+    return this.where(property, operator, value);
   }
 
-  notEqualTo(field: string, value: any, caseInsensitive?: boolean) {
+  notEqualTo(property: string, value: any, caseInsensitive?: boolean) {
     const operator = caseInsensitive ? '!=[c]' : '!=';
 
-    return this.where(field, operator, value);
+    return this.where(property, operator, value);
   }
 
-  like(field: string, value: string, caseInsensitive?: boolean) {
+  like(property: string, value: string, caseInsensitive?: boolean) {
     const operator = caseInsensitive ? 'LIKE[c]' : 'LIKE';
 
-    return this.where(field, operator, value);
+    return this.where(property, operator, value);
   }
 
-  contains(field: string, value: string, caseInsensitive?: boolean) {
+  contains(property: string, value: string, caseInsensitive?: boolean) {
     const operator = caseInsensitive ? 'CONTAINS[c]' : 'CONTAINS';
 
-    return this.where(field, operator, value);
+    return this.where(property, operator, value);
   }
 
-  beginsWith(field: string, value: string, caseInsensitive?: boolean) {
+  beginsWith(property: string, value: string, caseInsensitive?: boolean) {
     const operator = caseInsensitive ? 'BEGINSWITH[c]' : 'BEGINSWITH';
 
-    return this.where(field, operator, value);
+    return this.where(property, operator, value);
   }
 
-  endsWith(field: string, value: string, caseInsensitive?: boolean) {
+  endsWith(property: string, value: string, caseInsensitive?: boolean) {
     const operator = caseInsensitive ? 'ENDSWITH[c]' : 'ENDSWITH';
 
-    return this.where(field, operator, value);
+    return this.where(property, operator, value);
   }
 
-  greaterThan(field: string, value: RealmNumericValueType) {
-    return this.where(field, '>', value);
+  greaterThan(property: string, value: RealmNumericValueType) {
+    return this.where(property, '>', value);
   }
 
   greaterThanOrEqualTo(
-    field: string,
+    property: string,
     value: RealmNumericValueType,
   ) {
-    return this.where(field, '>=', value);
+    return this.where(property, '>=', value);
   }
 
-  lessThan(field: string, value: RealmNumericValueType) {
-    return this.where(field, '<', value);
+  lessThan(property: string, value: RealmNumericValueType) {
+    return this.where(property, '<', value);
   }
 
   lessThanOrEqualTo(
-    field: string,
+    property: string,
     value: RealmNumericValueType,
   ) {
-    return this.where(field, '<=', value);
+    return this.where(property, '<=', value);
   }
 
-  between(field: string, start: RealmNumericValueType, end: RealmNumericValueType) {
+  between(property: string, start: RealmNumericValueType, end: RealmNumericValueType) {
     return this
       .clone()
       ._beginGroup()
-      ._where(field, '>=', start)
-      ._where(field, '<=', end)
+      ._where(property, '>=', start)
+      ._where(property, '<=', end)
       ._endGroup();
   }
 
@@ -151,7 +151,7 @@ export class RealmQueryBuilder<T = any> {
     return this.clone()._not();
   }
 
-  in(field: string, values: ReadonlyArray<any>) {
+  in(property: string, values: ReadonlyArray<any>) {
     const thisClone = this.clone();
 
     if (values.length === 0) {
@@ -162,19 +162,19 @@ export class RealmQueryBuilder<T = any> {
     values.forEach((value, index) => {
       if (index !== 0) thisClone._setOperator('OR');
 
-      thisClone._where(field, '==', value);
+      thisClone._where(property, '==', value);
     });
     thisClone._endGroup();
 
     return thisClone;
   }
 
-  distinct(...fields: string[]) {
-    return this.clone()._distinct(...fields);
+  distinct(...properties: string[]) {
+    return this.clone()._distinct(...properties);
   }
 
-  sorted(field: string, order?: RealmQuerySort) {
-    return this.clone()._sorted(field, order);
+  sorted(property: string, order?: RealmQuerySort) {
+    return this.clone()._sorted(property, order);
   }
 
   limit(limit: number) {
@@ -191,8 +191,8 @@ export class RealmQueryBuilder<T = any> {
     return result[result.length - 1];
   }
 
-  findBy(field: string, value: any) {
-    return this.clone()._where(field, '==', value).first();
+  findBy(property: string, value: any) {
+    return this.clone()._where(property, '==', value).first();
   }
 
   size() {
@@ -231,7 +231,7 @@ export class RealmQueryBuilder<T = any> {
       prefixes: this._prefixes,
       actions: this._actions,
       suffixes: this._suffixes,
-      distinctFields: this._distinctFields,
+      distinctProperties: this._distinctProperties,
       operator: this._operator,
     };
   }
@@ -245,7 +245,7 @@ export class RealmQueryBuilder<T = any> {
     this._prefixes = mergePrefixes(data);
     this._actions = mergeActions(data);
     this._suffixes = mergeSuffixes(data);
-    this._distinctFields = mergeDistinctFields(data);
+    this._distinctProperties = mergeDistinctProperties(data);
 
     return this;
   }
@@ -256,10 +256,10 @@ export class RealmQueryBuilder<T = any> {
     return this;
   }
 
-  private _sorted(field: string, order?: RealmQuerySort) {
+  private _sorted(property: string, order?: RealmQuerySort) {
     const isDescending = order === 'desc';
 
-    this._realmResult = this._realmResult.sorted(field, isDescending);
+    this._realmResult = this._realmResult.sorted(property, isDescending);
 
     return this;
   }
@@ -275,8 +275,8 @@ export class RealmQueryBuilder<T = any> {
   private _getQuerySuffix() {
     let suffix = '';
 
-    if (this._distinctFields.length) {
-      const distinct = this._distinctFields.join(',');
+    if (this._distinctProperties.length) {
+      const distinct = this._distinctProperties.join(',');
       suffix += ` DISTINCT(${distinct})`;
     }
 
@@ -343,14 +343,14 @@ export class RealmQueryBuilder<T = any> {
     return this;
   }
 
-  private _distinct(...fields: string[]) {
-    this._distinctFields = [...fields];
+  private _distinct(...properties: string[]) {
+    this._distinctProperties = [...properties];
 
     return this;
   }
 
   private _where(
-    field: string,
+    property: string,
     condition: RealmConditionalOperator,
     value: any,
   ) {
@@ -358,7 +358,7 @@ export class RealmQueryBuilder<T = any> {
       ...this._actions,
       {
         type: 'filter',
-        field,
+        property,
         condition,
         value,
         logicalOperator: this._operator,

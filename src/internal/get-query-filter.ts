@@ -47,7 +47,7 @@ const getQueryFilter = ({ actions, prefixes, suffixes }: Params) => {
     query += getPrefix(index);
 
     if (criteria.type === 'filter') {
-      query += `${criteria.field} ${criteria.condition} $${filterIndex}`;
+      query += `${criteria.property} ${criteria.condition} $${filterIndex}`;
       filterIndex += 1;
     } else if (criteria.type === 'predicate') {
       query += criteria.predicate;

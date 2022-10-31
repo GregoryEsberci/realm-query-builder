@@ -10,7 +10,7 @@ type Atributes = {
   actions: DeepReadonlyArray<Action>,
   prefixes: DeepReadonlyArray<Prefix>,
   suffixes: DeepReadonlyArray<Suffix>,
-  distinctFields: DeepReadonlyArray<string>,
+  distinctProperties: DeepReadonlyArray<string>,
   operator: RealmLogicOperator,
 }
 
@@ -52,6 +52,6 @@ export const mergeActions = ({ current, received }: Params) => {
   return [...current.actions, ...receivedActions];
 };
 
-export const mergeDistinctFields = ({ current, received }: Params) => (
-  [...current.distinctFields, ...received.distinctFields]
+export const mergeDistinctProperties = ({ current, received }: Params) => (
+  [...current.distinctProperties, ...received.distinctProperties]
 );

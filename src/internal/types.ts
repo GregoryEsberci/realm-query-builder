@@ -21,7 +21,7 @@ export type Predicate = {
 export type Filter = {
   type: 'filter',
   value: any,
-  field: string,
+  property: string,
   condition: RealmConditionalOperator,
   logicalOperator: RealmLogicOperator,
 }
