@@ -1,36 +1,42 @@
 # realm-query-builder
-A realm query builder to realm.js.
 
-Immutable:
-All API operations that change the realm-query-builder object will return a new instance instead.
+Is a powerful query builder for Realm.js, designed to simplify and enhance the querying experience for your Realm databases.
+
+**Immutable:** All API operations that change the realm-query-builder object will return a new instance instead.
 
 ## Installation
-```
+
+```sh
 npm install --save realm-query-builder
-or
+# or
 yarn add realm-query-builder
 ```
 
+## Useful Links
 
-## Exemple
+Some useful links for understanding and working with Realm queries:
+
+- [Realm Query Language](https://www.mongodb.com/docs/realm/realm-query-language/) (Comprehensive)
+- [Realm Query Language API](https://www.mongodb.com/docs/realm-sdks/js/latest/tutorial-query-language.html) (API-specific)
+
+These resources provide in-depth information on Realm query language and its usage, helping you make the most out of `realm-query-builder`.
+
+## Example
 
 ### Using realmQueryBuilder directly
+
 ```ts
 import realmQueryBuilder from 'realm-query-builder';
 
-realmQueryBuilder(realm.objects('User'))
+const users = realmQueryBuilder(realm.objects('User'))
   .equalTo('active', true)
   .greaterThanOrEqualTo('age', 18)
   .in('country', ['BR', 'AR', 'US'])
   .distinct('name')
   .result();
-```
-The same as:
-```ts
-realm.objects('User').filtered('active == $0 AND age >= $1 AND (country == $2 OR country == $3 OR country == $4) DISTINCT(name)', true, 18, 'BR', 'AR', 'US')
-```
 
--------
+console.log(users);
+```
 
 ### Extending
 
@@ -52,134 +58,72 @@ class UserQuery extends RealmQueryBuilder<User & Realm.Object> {
   }
 }
 
-const userQuery = () =>  new UserQuery(realm.objects<User>('User'));
+const userQuery = () => new UserQuery(realm.objects<User>('User'));
 
-userQuery()
+const users = userQuery()
   .active()
   .byAge(18)
   .distinct('country')
   .result();
+
+console.log(users);
 ```
-
-The same as:
-```ts
-realm.objects('User').filtered('active == $0 AND age == $1 DISTINCT(country)', true, 18);
-```
-
-
-
 
 ## API
 
-* [`clone(): this`](#clone-this)
+### `where(field: string, condition: RealmConditionalOperator, value: any): this`
 
-* [`where(field: string, condition: RealmConditionalOperator, value: any): this`](#wherefield-string-condition-realmconditionaloperator-value-any-this)
+Adds a filter to the query with the specified property, operator and value.
 
-* [`equalTo(field: string, value: any, caseInsensitive?: boolean): this`](#equaltofield-string-value-any-caseinsensitive-boolean-this)
+### `equalTo(field: string, value: any, caseInsensitive?: boolean): this`
 
-* [`notEqualTo(field: string, value: any, caseInsensitive?: boolean): this`](#notequaltofield-string-value-any-caseinsensitive-boolean-this)
+Filter the data by property that match a specified value.
 
-* [`like(field: string, value: string, caseInsensitive?: boolean): this`](#likefield-string-value-string-caseinsensitive-boolean-this)
+### `notEqualTo(field: string, value: any, caseInsensitive?: boolean): this`
 
-* [`contains(field: string, value: string, caseInsensitive?: boolean): this`](#containsfield-string-value-string-caseinsensitive-boolean-this)
+Evaluates to true expression matches property value wildcard string expression. A wildcard string expression is a string that uses normal characters with two special wildcard characters:
 
-* [`beginsWith(field: string, value: string, caseInsensitive?: boolean): this`](#beginswithfield-string-value-string-caseinsensitive-boolean-this)
+- The * wildcard matches zero or more of any character.
+- The ? wildcard matches any character.
 
-* [`endsWith(field: string, value: string, caseInsensitive?: boolean): this`](#endswithfield-string-value-string-caseinsensitive-boolean-this)
+For example, the wildcard string `d?g` matches `dog`, `dig`, and `dug`, but not `ding`, `dg`, or `a dog`.
 
-* [`greaterThan(field: string, value: RealmNumericValueType): this`](#greaterthanfield-string-value-realmnumericvaluetype-this)
+### `like(field: string, value: string, caseInsensitive?: boolean): this`
 
-* [`greaterThanOrEqualTo(field: string, value: RealmNumericValueType): this`](#greaterthanorequaltofield-string-value-realmnumericvaluetype-this)
+An alias for [`where(field, 'LIKE' | 'LIKE[c]', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this). If `caseInsensitive: true`, the operator applied will be `LIKE[c]`.
 
-* [`lessThan(field: string, value: RealmNumericValueType): this`](#lessthanfield-string-value-realmnumericvaluetype-this)
+### `contains(field: string, value: string, caseInsensitive?: boolean): this`
 
-* [`lessThanOrEqualTo(field: string, value: RealmNumericValueType): this`](#lessthanorequaltofield-string-value-realmnumericvaluetype-this)
+An alias for [`where(field, 'CONTAINS' | 'CONTAINS[c]', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this). If `caseInsensitive: true`, the operator applied will be `CONTAINS[c]`.
 
-* [`between(field: string, start: RealmNumericValueType, end: RealmNumericValueType): this`](#betweenfield-string-start-realmnumericvaluetype-end-realmnumericvaluetype-this)
+### `beginsWith(field: string, value: string, caseInsensitive?: boolean): this`
 
-* [`or(): this`](#or-this)
+An alias for [`where(field, 'BEGINSWITH' | BEGINSWITH[c], value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this). If `caseInsensitive`, `true` the operator applied will be `BEGINSWITH[c]`.
 
-* [`and(): this`](#and-this)
+### `endsWith(field: string, value: string, caseInsensitive?: boolean): this`
 
-* [`beginGroup(): this`](#begingroup-this)
+An alias for [`where(field, 'ENDSWITH' | ENDSWITH[c], value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this). If `caseInsensitive: true`, the operator applied will be `ENDSWITH[c]`.
 
-* [`endGroup(): this`](#endgroup-this)
+### `greaterThan(field: string, value: RealmNumericValueType): this`
 
-* [`in(field: string, values: ReadonlyArray): this`](#infield-string-values-readonlyarrayany-this)
+An alias for [`where(field, '>', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this).
 
-* [`not()`](#not)
+### `greaterThanOrEqualTo(field: string, value: RealmNumericValueType): this`
 
-* [`distinct(...fields: string[]): this`](#distinctfields-string-this)
+An alias for [`where(field, '>=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this).
 
-* [`sorted(field: string, order?: RealmQuerySort): this`](#sortedfield-string-order-realmquerysort-this)
+### `lessThan(field: string, value: RealmNumericValueType): this`
 
-* [`limit(limit: number): this`](#limitlimit-number-this)
+An alias for [`where(field, '<', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this).
 
-* [`first(field: string, value: any): T | undefined`](#last-t--undefined)
+### `lessThanOrEqualTo(field: string, value: RealmNumericValueType): this`
 
-* [`last(field: string, value: any): T | undefined`](#first-t--undefined)
+An alias for [`where(field, '<=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this).
 
-* [`findBy(field: string, value: any): T | undefined`](#findbyfield-string-value-any-t--undefined)
+### `between(field: string, start: RealmNumericValueType, end: RealmNumericValueType): this`
 
-* [`size(): number`](#size-number)
+A between condition, same as:
 
-* [`min(property?: string): V | null`](#minv-extends-realmnumericvaluetypeproperty-string-v--null)
-
-* [`max(property?: string): V | null`](#maxv-extends-realmnumericvaluetypeproperty-string-v--null)
-
-* [`sum(property?: string): number | null`](#sumproperty-string-number--null)
-
-* [`avg(property?: string): number`](#avgproperty-string-number)
-
-* [`merge(query: RealmQueryBuilder): this`](#mergequery-realmquerybuildert-this)
-
-* [`result(): Realm.Results`](#result-realmresultst)
-
-
-#### `clone(): this`
-Create a clone of the current object
-
-#### `where(field: string, condition: RealmConditionalOperator, value: any): this`
-Add condition
-
-#### `truepredicate(): this`
-A predicate that always evaluates to TRUE
-
-#### `falsepredicate(): this`
-A predicate that always evaluates to FALSE
-
-#### `equalTo(field: string, value: any, caseInsensitive?: boolean): this`
-Alias to [`where(field, '==', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `==[c]`
-
-#### `notEqualTo(field: string, value: any, caseInsensitive?: boolean): this`
-Alias to [`where(field, '!=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `!=[c]`
-
-#### `like(field: string, value: string, caseInsensitive?: boolean): this`
-Alias to [`where(field, 'LIKE', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `LIKE[c]`
-
-#### `contains(field: string, value: string, caseInsensitive?: boolean): this`
-Alias to [`where(field, 'CONTAINS', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `CONTAINS[c]`
-
-#### `beginsWith(field: string, value: string, caseInsensitive?: boolean): this`
-Alias to [`where(field, 'BEGINSWITH', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive` `true` the operador applied will be `BEGINSWITH[c]`
-
-#### `endsWith(field: string, value: string, caseInsensitive?: boolean): this`
-Alias to [`where(field, 'ENDSWITH', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this), if `caseInsensitive: true` the operador applied will be `ENDSWITH[c]`
-
-#### `greaterThan(field: string, value: RealmNumericValueType): this`
-Alias to [`where(field, '>', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this)
-
-#### `greaterThanOrEqualTo(field: string, value: RealmNumericValueType): this`
-Alias to [`where(field, '>=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this)
-
-#### `lessThan(field: string, value: RealmNumericValueType): this`
-Alias to [`where(field, '<', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this)
-
-#### `lessThanOrEqualTo(field: string, value: RealmNumericValueType): this`
-Alias to [`where(field, '<=', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this)
-
-#### `between(field: string, start: RealmNumericValueType, end: RealmNumericValueType): this`
-Between condition, same as:
 ```ts
 realmQueryBuilder(object)
   .beginGroup()
@@ -188,19 +132,24 @@ realmQueryBuilder(object)
   .endGroup();
 ```
 
-#### `or(): this`
-Join previous and next conditions with `OR` operator
+### `or(): this`
 
-#### `and(): this`
-Join previous and next conditions with `AND` operator, the default operator is `AND`
+Join previous and next conditions with the `OR` operator.
 
-#### `beginGroup(): this`
-Begin the group (left parenthesis)
+### `and(): this`
 
-#### `endGroup(): this`
-Begin the group (right parenthesis)
+Join previous and next conditions with the `AND` operator, the default operator is `AND`.
 
-exemple
+### `beginGroup(): this`
+
+Begins a group for combining filter conditions in the query. Use with [endGroup()](#endgroup-this) to close the group.
+
+### `endGroup(): this`
+
+Ends a group for combining filter conditions in the query. Should be used after starting a group with [beginGroup()](#begingroup-this).
+
+Example:
+
 ```ts
 realmQueryBuilder(realm.objects('User'))
   .equalTo('active', true)
@@ -211,74 +160,48 @@ realmQueryBuilder(realm.objects('User'))
   .endGroup()
   .result();
 ```
-The same as:
-```ts
-realm.objects('User').filtered('active == $0 AND (canWrite == $1 OR admin == $2)', true, true, true)
-```
 
-#### `in(field: string, values: ReadonlyArray<any>): this`
-In comparison, the realm.js don't support `IN` operator, it is generate with `OR`.
-The query can be slow when filters are applied ([result](#result-realmresultst)) if has much values or/and register on DB
+### `in(field: string, values: ReadonlyArray<any>): this`
 
-Executed:
-```ts
-realResult.filtered('(field == $0 OR field == $1 OR field == $N)', values[0], values[1], values['N'])
-```
+Adds an `IN` filter condition to the query, filtering objects where the specified property's value matches any of the values in the provided array.
+Realm.js started supporting `IN` in [version 10.20.0](https://github.com/realm/realm-js/issues/2781#issuecomment-1223641109), it is applied with `OR` chains for more compatibility.
 
 ### `not(): this`
-Implements [not operador](https://www.mongodb.com/docs/realm/reference/realm-query-language/#logical-operators) for the next operation
 
-Exemple: 
-```ts
-realmQueryBuilder(realm.objects('User'))
-  .in('id', [11, 21, 34])
-  .result()
-```
-The same as:
-```ts
-realm.objects('User').filtered('(id == $0 OR id == $1 OR id == $2)', 11, 21, 34)
-```
+Implements [not operator](https://www.mongodb.com/docs/realm/realm-query-language/#logical-operators) for the next operation or group.
 
-#### `distinct(...fields: string[]): this`
-Add `DISTINCT` suffix, see: [Realm Query Language](https://www.mongodb.com/docs/realm/reference/realm-query-language/#sort--distinct--limit)
+### `distinct(...fields: string[]): this`
 
-#### `sorted(field: string, order?: RealmQuerySort): this`
-Call `sorted` method, see: [sorted](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#sorted)
+Add `DISTINCT` suffix, see: [Realm Query Language](https://www.mongodb.com/docs/realm/realm-query-language/#sort--distinct---limit)
 
-#### `limit(limit: number): this`
-Add `LIMIT` suffix, see: [Realm Query Language](https://www.mongodb.com/docs/realm/reference/realm-query-language/#sort--distinct--limit)
+### `sorted(field: string, order?: RealmQuerySort): this`
 
-#### `first(): T | undefined`
-Get first result.
+Call the `sorted` method, see: [sorted](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Collection.html#sorted)
 
-#### `last(): T | undefined`
-Get last result.
+### `limit(limit: number): this`
 
-#### `findBy(field: string, value: any): T | undefined`
-Apply the [`where(field, '==', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this) and return the first value.
+Add `LIMIT` suffix, see: [Realm Query Language](https://www.mongodb.com/docs/realm/realm-query-language/#sort--distinct---limit)
 
-#### `size(): number`
-Query the date and get results size, alias to [result().length](#and-realmquerybuildert)
+### `clone(): this`
 
+Create a clone of the current object.
 
-#### `min<V extends RealmNumericValueType>(property?: string): V | null`
-Call [realm.js min](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#min)
+#### `truepredicate(): this`
 
-#### `max<V extends RealmNumericValueType>(property?: string): V | null`
-Call [realm.js max](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#max)
+A predicate that always evaluates to TRUE.
 
-#### `sum(property?: string): number | null`
-Call [realm.js sum](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#sum)
+#### `falsepredicate(): this`
 
-#### `avg(property?: string): number`
-Call [realm.js avg](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#avg)
+A predicate that always evaluates to FALSE.
 
-#### `merge(query: RealmQueryBuilder<T>)): this`
-Merge two `RealmQueryBuilder`
+### `merge(query: RealmQueryBuilder<T>)): this`
 
-The operators [sorted](#sortedfield-string-order-realmquerysort-realmquerybuildert) and [limit](#limitlimit-number-realmquerybuildert) are not merged
+Merges the current query with another RealmQueryBuilder instance.
 
-Exemple
+The operators sorted and limit are not merged.
+
+Example:
+
 ```ts
 const queryA =  realmQueryBuilder(realm.objects('User'))
   .equalTo('active', true)
@@ -294,10 +217,39 @@ const queryB =  realmQueryBuilder(realm.objects('User'))
   .endGroup()
   .result();
 ```
-The same as:
-```ts
-realm.objects('User').filtered('age >= $0 OR (active == $1 AND admin == $2) LIMIT(20)', 18, true, false)
-```
 
-#### `result(): Realm.Results<T>`
-Execute the query with setted params (filters, distinct, limit, etc)
+### `min<V extends RealmNumericValueType>(property?: string): V | null`
+
+Call [realm.js min](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#min)
+
+### `max<V extends RealmNumericValueType>(property?: string): V | null`
+
+Call [realm.js max](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#max)
+
+### `sum(property?: string): number | null`
+
+Call [realm.js sum](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#sum)
+
+### `avg(property?: string): number`
+
+Call [realm.js avg](https://www.mongodb.com/docs/realm-sdks/js/latest/Realm.Set.html#avg)
+
+### `first(): T | undefined`
+
+Get the first result.
+
+### `last(): T | undefined`
+
+Get the last result.
+
+### `findBy(field: string, value: any): T | undefined`
+
+Apply the [`where(field, '==', value)`](#wherefield-string-condition-realmconditionaloperator-value-any-this) condition and return the first value.
+
+### `size(): number`
+
+Query the data and get the result's size, alias to [result().length](#result-realmresultst)
+
+### `result(): Realm.Results<T>`
+
+Executes the query and returns the filtered results
