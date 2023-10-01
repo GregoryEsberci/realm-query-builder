@@ -42,6 +42,7 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'no-param-reassign': 'off',
     'no-use-before-define': 'off',
+    'max-len': ['error', { comments: 200, code: 150 }],
 
     'import/extensions': 'off',
 
