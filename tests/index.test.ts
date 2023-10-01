@@ -656,6 +656,29 @@ describe('methods', () => {
       expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('result', () => {
+    it('sucessful', () => {
+      const result = instance.where('field0', '==', 'value0').result();
+
+      expect(result).toBe(fakeRealmResults);
+
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('field0 == $0', 'value0');
+      expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
+    });
+
+    it('with error', () => {
+      fakeRealmResults.filtered.mockImplementation(() => {
+        throw new Error('Fake error');
+      });
+
+      const query = instance.where('field0', '==', 'value0');
+
+      expect(query.result.bind(query)).toThrow(
+        'RealmQueryBuilder: Fail to get result, error: Fake error;\nquery: "field0 == $0";\nvalues: "["value0"]',
+      );
+    });
+  });
 });
 
 it('class extends', () => {

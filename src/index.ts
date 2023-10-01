@@ -467,7 +467,15 @@ export class RealmQueryBuilder<T = any> {
     const query = this._getQuery();
     const values = this._getQueryValues();
 
-    return this._realmResult.filtered(query, ...values);
+    try {
+      return this._realmResult.filtered(query, ...values);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'unknown';
+
+      throw new Error(
+        `RealmQueryBuilder: Fail to get result, error: ${errorMessage};\nquery: "${query}";\nvalues: "${JSON.stringify(values)}"`,
+      );
+    }
   }
 
   private _makeMergeData() {
