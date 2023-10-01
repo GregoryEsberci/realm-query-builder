@@ -9,8 +9,8 @@ beforeEach(() => {
   // @ts-ignore
   fakeRealmResults = [];
 
-  fakeRealmResults.filtered = jest.fn().mockReturnValue(fakeRealmResults);
-  fakeRealmResults.sorted = jest.fn().mockReturnValue(fakeRealmResults);
+  fakeRealmResults.filtered = jest.fn().mockReturnThis();
+  fakeRealmResults.sorted = jest.fn().mockReturnThis();
 });
 
 describe('methods', () => {
@@ -385,18 +385,41 @@ describe('methods', () => {
     });
   });
 
-  it('distinct', () => {
-    const newInstance = instance.distinct('field1', 'field2');
+  describe('distinct', () => {
+    it('multiple fields', () => {
+      const newInstance = instance.distinct('field1', 'field2');
 
-    newInstance.result();
+      newInstance.result();
 
-    expect(newInstance).not.toBe(instance);
-    expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
-    expect(fakeRealmResults.filtered).toHaveBeenCalledWith('TRUEPREDICATE DISTINCT(field1,field2)');
-    expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
+      expect(newInstance).not.toBe(instance);
+      expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('TRUEPREDICATE DISTINCT(field1,field2)');
+      expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
+    });
+
+    it('multiple calls', () => {
+      const newInstance = instance.distinct('field1').distinct('field2');
+
+      newInstance.result();
+
+      expect(newInstance).not.toBe(instance);
+      expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('TRUEPREDICATE DISTINCT(field1,field2)');
+      expect(fakeRealmResults.filtered).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('sorted', () => {
+    it('multiple fields', () => {
+      const newInstance = instance.sorted('field1').sorted('field2', 'desc');
+
+      expect(newInstance).not.toBe(instance);
+      expect(newInstance).toBeInstanceOf(RealmQueryBuilder);
+      expect(fakeRealmResults.sorted).toHaveBeenCalledWith('field1', false);
+      expect(fakeRealmResults.sorted).toHaveBeenCalledWith('field2', true);
+      expect(fakeRealmResults.sorted).toHaveBeenCalledTimes(2);
+    });
+
     it('default order', () => {
       const newInstance = instance.sorted('field1');
 

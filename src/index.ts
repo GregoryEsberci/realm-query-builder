@@ -588,7 +588,7 @@ export class RealmQueryBuilder<T = any> {
   }
 
   private _distinct(...properties: string[]) {
-    this._distinctProperties = [...properties];
+    this._distinctProperties = [...this._distinctProperties, ...properties];
 
     return this;
   }
