@@ -51,6 +51,13 @@ const getQueryFilter = ({ actions, prefixes, suffixes }: Params) => {
       filterIndex += 1;
     } else if (criteria.type === 'predicate') {
       query += criteria.predicate;
+    } else if (criteria.type === 'filtered') {
+      query += criteria.query.replace(
+        /(?<=\$)(\d+)/g, // matches the number that is preceded by a $
+        (valueIndex) => (+valueIndex + filterIndex).toString(),
+      );
+
+      filterIndex += criteria.values.length;
     }
 
     query += getSuffix(index);

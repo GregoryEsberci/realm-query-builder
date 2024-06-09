@@ -26,6 +26,13 @@ export type Filter = {
   logicalOperator: RealmLogicOperator,
 }
 
+export type Filtered = {
+  type: 'filtered',
+  query: string,
+  values: any[]
+  logicalOperator: RealmLogicOperator,
+}
+
 export type Prefix = {
   value: 'NOT' | '(',
   at: number
@@ -36,4 +43,4 @@ export type Suffix = {
   at: number
 }
 
-export type Action = Filter | Predicate;
+export type Action = Filter | Predicate | Filtered;

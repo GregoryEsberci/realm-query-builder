@@ -42,6 +42,31 @@ describe('methods', () => {
     });
   });
 
+  describe('filtered', () => {
+    it('without values', () => {
+      const query = 'SUBQUERY(friends, $friend, $friend.age > 21).@count > 0';
+      const whereReturn = instance.filtered(query);
+
+      whereReturn.result();
+
+      expect(whereReturn).toBeInstanceOf(RealmQueryBuilder);
+      expect(whereReturn).not.toBe(instance);
+
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith(query);
+    });
+
+    it('with values', () => {
+      const whereReturn = instance.filtered('name == $0', 'John').or().filtered('age == $0 AND city == $1', 21, 'SF');
+
+      whereReturn.result();
+
+      expect(whereReturn).toBeInstanceOf(RealmQueryBuilder);
+      expect(whereReturn).not.toBe(instance);
+
+      expect(fakeRealmResults.filtered).toHaveBeenCalledWith('name == $0 OR age == $1 AND city == $2', 'John', 21, 'SF');
+    });
+  });
+
   it('truepredicate', () => {
     const whereReturn = instance
       .equalTo('value0', 'value0')

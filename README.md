@@ -75,6 +75,10 @@ console.log(users);
 
 Adds a filter to the query with the specified property, operator and value.
 
+### `filtered(query: string, ...values: any[]): this`
+
+Concatenate the `query` as string, like realm `Collection.filtered`.
+
 ### `equalTo(field: string, value: any, caseInsensitive?: boolean): this`
 
 Filter the data by property that match a specified value.

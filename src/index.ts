@@ -54,6 +54,17 @@ export class RealmQueryBuilder<T = any> {
   }
 
   /**
+   * Concatenate the `query`, like realm `Collection.filtered`.
+   *
+   * @param {string} query.
+   * @param  {any[]} ...values
+   * @returns {this} - The modified RealmQueryBuilder instance.
+   */
+  filtered(query: string, ...values: any[]) {
+    return this.clone()._filtered(query, values);
+  }
+
+  /**
    * Adds a filter to the query with the specified property, operator and value.
    *
    * @param {string} property - The property to filter.
@@ -548,9 +559,17 @@ export class RealmQueryBuilder<T = any> {
   }
 
   private _getQueryValues() {
-    return this._actions
-      .filter((action): action is Filter => action.type === 'filter')
-      .map(({ value }) => value);
+    return this._actions.reduce<any[]>((values, action) => {
+      if (action.type === 'filter') {
+        return [...values, action.value];
+      }
+
+      if (action.type === 'filtered') {
+        return [...values, ...action.values];
+      }
+
+      return values;
+    }, []);
   }
 
   private _pushPrefix(value: Prefix['value']) {
@@ -597,6 +616,22 @@ export class RealmQueryBuilder<T = any> {
 
   private _distinct(...properties: string[]) {
     this._distinctProperties = [...this._distinctProperties, ...properties];
+
+    return this;
+  }
+
+  private _filtered(query: string, values: any[] = []) {
+    this._actions = [
+      ...this._actions,
+      {
+        type: 'filtered',
+        query,
+        values,
+        logicalOperator: this._operator,
+      },
+    ];
+
+    this._resetOperator();
 
     return this;
   }
