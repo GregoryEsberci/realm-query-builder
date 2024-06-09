@@ -40,25 +40,16 @@ const getQueryFilter = ({ actions, prefixes, suffixes }: Params) => {
   const getSuffix = makeGetsSuffixes(suffixes);
 
   return actions.reduce((query, criteria, index) => {
-    const predicate = index === 0 ? undefined : criteria.logicalOperator;
-
-    if (predicate) query += ` ${predicate} `;
+    if (index !== 0) query += ` ${criteria.logicalOperator} `;
 
     query += getPrefix(index);
 
-    if (criteria.type === 'filter') {
-      query += `${criteria.property} ${criteria.condition} $${filterIndex}`;
-      filterIndex += 1;
-    } else if (criteria.type === 'predicate') {
-      query += criteria.predicate;
-    } else if (criteria.type === 'filtered') {
-      query += criteria.query.replace(
-        /(?<=\$)(\d+)/g, // matches the number that is preceded by a $
-        (valueIndex) => (+valueIndex + filterIndex).toString(),
-      );
+    query += criteria.query.replace(
+      /(?<=\$)(\d+)/g, // matches the number that is preceded by a $
+      (valueIndex) => (+valueIndex + filterIndex).toString(),
+    );
 
-      filterIndex += criteria.values.length;
-    }
+    filterIndex += criteria.values.length;
 
     query += getSuffix(index);
 

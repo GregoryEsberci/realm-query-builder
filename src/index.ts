@@ -10,7 +10,6 @@ import type {
   DeepReadonlyArray,
   Predicate,
   Action,
-  Filter,
   Prefix,
   Suffix,
 } from './internal/types';
@@ -61,7 +60,7 @@ export class RealmQueryBuilder<T = any> {
    * @returns {this} - The modified RealmQueryBuilder instance.
    */
   filtered(query: string, ...values: any[]) {
-    return this.clone()._filtered(query, values);
+    return this.clone()._filtered(query, ...values);
   }
 
   /**
@@ -559,17 +558,7 @@ export class RealmQueryBuilder<T = any> {
   }
 
   private _getQueryValues() {
-    return this._actions.reduce<any[]>((values, action) => {
-      if (action.type === 'filter') {
-        return [...values, action.value];
-      }
-
-      if (action.type === 'filtered') {
-        return [...values, ...action.values];
-      }
-
-      return values;
-    }, []);
+    return this._actions.flatMap((action) => action.values);
   }
 
   private _pushPrefix(value: Prefix['value']) {
@@ -620,7 +609,7 @@ export class RealmQueryBuilder<T = any> {
     return this;
   }
 
-  private _filtered(query: string, values: any[] = []) {
+  private _filtered(query: string, ...values: any[]) {
     this._actions = [
       ...this._actions,
       {
@@ -641,37 +630,11 @@ export class RealmQueryBuilder<T = any> {
     condition: RealmConditionalOperator,
     value: any,
   ) {
-    this._actions = [
-      ...this._actions,
-      {
-        type: 'filter',
-        property,
-        condition,
-        value,
-        logicalOperator: this._operator,
-      },
-    ];
-
-    this._resetOperator();
-
-    return this;
+    return this._filtered(`${property} ${condition} $0`, value);
   }
 
-  private _predicate(
-    predicate: Predicate['predicate'],
-  ) {
-    this._actions = [
-      ...this._actions,
-      {
-        type: 'predicate',
-        predicate,
-        logicalOperator: this._operator,
-      },
-    ];
-
-    this._resetOperator();
-
-    return this;
+  private _predicate(predicate: Predicate) {
+    return this._filtered(predicate);
   }
 }
 

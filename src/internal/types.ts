@@ -1,4 +1,4 @@
-import type { RealmConditionalOperator, RealmLogicOperator } from '../types';
+import type { RealmLogicOperator } from '../types';
 
 export type DeepReadonly<T> =
     T extends (infer R)[] ? DeepReadonlyArray<R> :
@@ -12,19 +12,7 @@ export type DeepReadonlyObject<T> = {
     readonly [P in keyof T]: DeepReadonly<T[P]>;
 };
 
-export type Predicate = {
-  type: 'predicate',
-  predicate: 'FALSEPREDICATE' | 'TRUEPREDICATE'
-  logicalOperator: RealmLogicOperator,
-}
-
-export type Filter = {
-  type: 'filter',
-  value: any,
-  property: string,
-  condition: RealmConditionalOperator,
-  logicalOperator: RealmLogicOperator,
-}
+export type Predicate = 'FALSEPREDICATE' | 'TRUEPREDICATE'
 
 export type Filtered = {
   type: 'filtered',
@@ -43,4 +31,4 @@ export type Suffix = {
   at: number
 }
 
-export type Action = Filter | Predicate | Filtered;
+export type Action = Filtered;
